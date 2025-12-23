@@ -16,6 +16,7 @@ import { Bell, Home, Settings, SquareKanban } from "lucide-react"
 import { projects } from "@/lib/placeholder-data"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
+import { cn } from "@/lib/utils"
 
 export function AppSidebar() {
   const pathname = usePathname();
