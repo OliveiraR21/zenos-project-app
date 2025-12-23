@@ -59,7 +59,9 @@ function TaskDetails({ task }: { task: Task }) {
     return (
         <>
             <SheetHeader>
-                <Input className="text-2xl font-semibold tracking-tight border-0 shadow-none focus-visible:ring-0 px-0" defaultValue={task.title} />
+                <SheetTitle asChild>
+                    <Input className="text-2xl font-semibold tracking-tight border-0 shadow-none focus-visible:ring-0 px-0" defaultValue={task.title} />
+                </SheetTitle>
                 <SheetDescription>
                     No projeto <a href="#" className="font-medium text-primary hover:underline">{task.projectId}</a>
                 </SheetDescription>
@@ -92,7 +94,7 @@ function TaskDetails({ task }: { task: Task }) {
                             <PopoverTrigger asChild>
                                 <Button variant="outline" className="w-full justify-start text-left font-normal">
                                     <CalendarIcon className="mr-2 h-4 w-4" />
-                                    {dueDate ? dueDate.toLocaleDateString() : <span>Escolha uma data</span>}
+                                    {dueDate ? dueDate.toLocaleDateString('pt-BR', { dateStyle: 'short' }) : <span>Escolha uma data</span>}
                                 </Button>
                             </PopoverTrigger>
                             <PopoverContent className="w-auto p-0">
@@ -186,6 +188,11 @@ function TaskDetails({ task }: { task: Task }) {
                     <div className="space-y-6">
                         {task.comments.map(comment => {
                             const author = users.find(u => u.id === comment.authorId);
+                            const [commentDate, setCommentDate] = useState('');
+                            useEffect(() => {
+                                setCommentDate(new Date(comment.createdAt).toLocaleString('pt-BR'));
+                            }, [comment.createdAt]);
+                            
                             return (
                             <div key={comment.id} className="flex gap-3">
                                 <Avatar className="size-9">
@@ -195,7 +202,7 @@ function TaskDetails({ task }: { task: Task }) {
                                 <div className="space-y-1">
                                     <div className="flex items-center gap-2">
                                         <p className="font-semibold text-sm">{author?.name}</p>
-                                        <p className="text-xs text-muted-foreground">{new Date(comment.createdAt).toLocaleString()}</p>
+                                        <p className="text-xs text-muted-foreground">{commentDate}</p>
                                     </div>
                                     <p className="text-sm text-foreground/80">{comment.content}</p>
                                 </div>
