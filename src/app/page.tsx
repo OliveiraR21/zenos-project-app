@@ -34,7 +34,7 @@ export default function Home() {
             <path d="M2 7L12 12L22 7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
             <path d="M12 22V12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
           </svg>
-          <span className="font-bold text-xl text-foreground">Zenos</span>
+          <span className="font-display text-2xl tracking-wider text-foreground">Zenos</span>
         </Link>
         <nav className="flex items-center gap-4">
           <Button variant="ghost" asChild>
@@ -47,7 +47,7 @@ export default function Home() {
       </header>
       <main className="flex-grow">
         <section className="container mx-auto px-4 sm:px-6 lg:px-8 py-20 md:py-32 text-center">
-          <h1 className="text-4xl md:text-6xl font-extrabold tracking-tighter mb-6 text-foreground">
+          <h1 className="text-5xl md:text-7xl font-display tracking-wider mb-6 text-foreground uppercase">
             Gerenciamento de Projetos, <span className="text-primary">Aperfeiçoado</span>.
           </h1>
           <p className="max-w-2xl mx-auto text-lg md:text-xl text-muted-foreground mb-10">
@@ -78,7 +78,7 @@ export default function Home() {
         <section className="bg-card py-20 md:py-32">
           <div className="container mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center mb-12">
-              <h2 className="text-3xl md:text-4xl font-bold">Tudo que você precisa para fazer o trabalho avançar</h2>
+              <h2 className="text-4xl md:text-5xl font-display tracking-wide uppercase">Tudo que você precisa para fazer o trabalho avançar</h2>
               <p className="text-muted-foreground mt-4 max-w-2xl mx-auto">
                 Zenos é uma plataforma flexível e completa que ajuda você a gerenciar projetos, organizar tarefas e colaborar com sua equipe.
               </p>
@@ -88,7 +88,7 @@ export default function Home() {
                 <Card key={index} className="bg-background/50 border-border/50 hover:border-primary/50 hover:bg-background transition-all transform hover:-translate-y-1">
                   <CardHeader>
                     {feature.icon}
-                    <CardTitle className="mt-4">{feature.title}</CardTitle>
+                    <CardTitle className="mt-4 font-display text-2xl tracking-wide uppercase">{feature.title}</CardTitle>
                   </CardHeader>
                   <CardContent>
                     <p className="text-muted-foreground">{feature.description}</p>

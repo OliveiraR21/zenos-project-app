@@ -10,7 +10,7 @@ export function AuthLayout({ children }: { children: React.ReactNode }) {
             <path d="M2 7L12 12L22 7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
             <path d="M12 22V12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
           </svg>
-        <span className="text-2xl font-bold text-foreground">Zenos</span>
+        <span className="font-display text-3xl tracking-wider text-foreground">Zenos</span>
       </div>
       <main className="w-full max-w-md">
         {children}
