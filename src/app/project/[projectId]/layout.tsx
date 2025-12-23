@@ -15,7 +15,7 @@ export default function ProjectLayout({
   children: React.ReactNode;
   params: { projectId: string };
 }) {
-  const { projectId } = params;
+  const projectId = params.projectId;
   const pathname = usePathname();
   const project = projects.find((p) => p.id === projectId);
 
