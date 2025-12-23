@@ -1,0 +1,85 @@
+"use client"
+import {
+  Sidebar,
+  SidebarContent,
+  SidebarGroup,
+  SidebarGroupLabel,
+  SidebarHeader,
+  SidebarMenu,
+  SidebarMenuItem,
+  SidebarMenuButton,
+  SidebarFooter
+} from "@/components/ui/sidebar"
+import { Bell, Home, Settings, SquareKanban } from "lucide-react"
+import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar"
+import { users, projects } from "@/lib/placeholder-data"
+import Link from "next/link"
+import { usePathname } from "next/navigation"
+
+const currentUser = users[0];
+
+export function AppSidebar() {
+  const pathname = usePathname();
+
+  return (
+     <Sidebar collapsible="icon">
+        <SidebarHeader>
+          <div className="flex items-center gap-2 w-full p-2">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="text-primary shrink-0">
+              <path d="M12 2L2 7V17L12 22L22 17V7L12 2Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              <path d="M2 7L12 12L22 7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              <path d="M12 22V12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+            <span className="font-bold text-xl text-foreground truncate">Zenos</span>
+          </div>
+        </SidebarHeader>
+        <SidebarContent>
+          <SidebarMenu>
+            <SidebarMenuItem>
+              <SidebarMenuButton asChild isActive={pathname === '/dashboard'} tooltip={{children: 'Dashboard'}}>
+                <Link href="/dashboard"><Home /><span>Dashboard</span></Link>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+            <SidebarMenuItem>
+              <SidebarMenuButton asChild isActive={pathname === '/notifications'} tooltip={{children: 'Notifications'}}>
+                <Link href="/notifications"><Bell /><span>Notifications</span></Link>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+            <SidebarMenuItem>
+              <SidebarMenuButton asChild isActive={pathname === '/settings'} tooltip={{children: 'Settings'}}>
+                <Link href="/settings"><Settings /><span>Settings</span></Link>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+          </SidebarMenu>
+          <SidebarGroup className="mt-4">
+            <SidebarGroupLabel>Projects</SidebarGroupLabel>
+            <SidebarMenu>
+              {projects.map((project) => (
+                <SidebarMenuItem key={project.id}>
+                  <SidebarMenuButton asChild isActive={pathname.startsWith(`/project/${project.id}`)} tooltip={{children: project.name}}>
+                    <Link href={`/project/${project.id}/board`}>
+                      <SquareKanban />
+                      <span>{project.name}</span>
+                    </Link>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              ))}
+            </SidebarMenu>
+          </SidebarGroup>
+        </SidebarContent>
+        <SidebarFooter>
+           <SidebarMenu>
+            <SidebarMenuItem>
+                <SidebarMenuButton tooltip={{children: currentUser.name, side: 'right'}}>
+                    <Avatar className="size-8">
+                        <AvatarImage src={currentUser.avatarUrl} alt={currentUser.name} />
+                        <AvatarFallback>{currentUser.name.charAt(0)}</AvatarFallback>
+                    </Avatar>
+                    <span className="truncate">{currentUser.name}</span>
+                </SidebarMenuButton>
+            </SidebarMenuItem>
+           </SidebarMenu>
+        </SidebarFooter>
+      </Sidebar>
+  )
+}

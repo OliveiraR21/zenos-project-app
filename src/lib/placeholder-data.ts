@@ -1,0 +1,242 @@
+import type { User, Project, Task, Notification } from './types';
+import { PlaceHolderImages } from './placeholder-images';
+
+const getUserAvatar = (id: string) => PlaceHolderImages.find(p => p.id === `user-${id}`)?.imageUrl || '';
+
+export const users: User[] = [
+  { id: '1', name: 'Alice Johnson', email: 'alice@example.com', avatarUrl: getUserAvatar('1') },
+  { id: '2', name: 'Bob Williams', email: 'bob@example.com', avatarUrl: getUserAvatar('2') },
+  { id: '3', name: 'Charlie Brown', email: 'charlie@example.com', avatarUrl: getUserAvatar('3') },
+  { id: '4', name: 'Diana Miller', email: 'diana@example.com', avatarUrl: getUserAvatar('4') },
+  { id: '5', name: 'Ethan Davis', email: 'ethan@example.com', avatarUrl: getUserAvatar('5') },
+];
+
+export const projects: Project[] = [
+  {
+    id: 'p1',
+    name: 'Zenos Website Redesign',
+    description: 'Complete overhaul of the main marketing website and brand identity.',
+    ownerId: '1',
+    memberIds: ['1', '2', '4'],
+  },
+  {
+    id: 'p2',
+    name: 'Q3 Mobile App Launch',
+    description: 'Develop and launch the new mobile application for iOS and Android.',
+    ownerId: '3',
+    memberIds: ['1', '3', '5'],
+  },
+  {
+    id: 'p3',
+    name: 'API Infrastructure Upgrade',
+    description: 'Migrate the backend services to a new, more scalable infrastructure.',
+    ownerId: '2',
+    memberIds: ['2', '4', '5'],
+  },
+   {
+    id: 'p4',
+    name: 'Customer Onboarding Flow',
+    description: 'Improve the new user experience and onboarding process.',
+    ownerId: '1',
+    memberIds: ['1', '4'],
+  },
+];
+
+const now = new Date();
+const getFutureDate = (days: number) => new Date(now.setDate(now.getDate() + days)).toISOString();
+
+export const tasks: Task[] = [
+  {
+    id: 't1',
+    projectId: 'p1',
+    title: 'Design new homepage mockups',
+    description: 'Create high-fidelity mockups in Figma for the new homepage layout.',
+    status: 'in-progress',
+    priority: 'high',
+    assigneeId: '4',
+    dueDate: getFutureDate(5),
+    tags: ['UI', 'Design'],
+    subtasks: [
+      { id: 'st1', title: 'Wireframe layouts', isCompleted: true },
+      { id: 'st2', title: 'Choose color palette', isCompleted: true },
+      { id: 'st3', title: 'Design final components', isCompleted: false },
+    ],
+    attachments: [],
+    comments: [
+        { id: 'c1', content: "Here are the first drafts, let me know what you think!", authorId: '4', createdAt: getFutureDate(-1)},
+        { id: 'c2', content: "Looks great! Can we try a version with the primary CTA higher up?", authorId: '1', createdAt: getFutureDate(0)},
+    ],
+    createdAt: getFutureDate(-2),
+  },
+  {
+    id: 't2',
+    projectId: 'p1',
+    title: 'Develop landing page components',
+    description: 'Build the React components for the new landing page based on Figma designs.',
+    status: 'todo',
+    priority: 'high',
+    assigneeId: '2',
+    dueDate: getFutureDate(12),
+    tags: ['Development', 'React'],
+    subtasks: [],
+    attachments: [],
+    comments: [],
+    createdAt: getFutureDate(-1),
+  },
+  {
+    id: 't3',
+    projectId: 'p1',
+    title: 'Setup A/B testing for new headline',
+    description: 'Implement A/B testing to determine the most effective headline copy.',
+    status: 'todo',
+    priority: 'medium',
+    assigneeId: '1',
+    dueDate: getFutureDate(15),
+    tags: ['Marketing', 'Testing'],
+    subtasks: [],
+    attachments: [],
+    comments: [],
+    createdAt: getFutureDate(0),
+  },
+  {
+    id: 't4',
+    projectId: 'p2',
+    title: 'Fix authentication bug on Android',
+    description: 'Users are reporting being logged out randomly on Android devices.',
+    status: 'blocked',
+    priority: 'high',
+    assigneeId: '5',
+    dueDate: getFutureDate(2),
+    tags: ['Bug', 'Android'],
+    subtasks: [],
+    attachments: [],
+    comments: [
+        {id: 'c3', content: "I'm blocked on this until the new backend API is deployed.", authorId: '5', createdAt: getFutureDate(0)}
+    ],
+    createdAt: getFutureDate(-3),
+  },
+  {
+    id: 't5',
+    projectId: 'p2',
+    title: 'Finalize app store screenshots',
+    description: 'Create and select the final screenshots for the App Store and Google Play listings.',
+    status: 'done',
+    priority: 'low',
+    assigneeId: '3',
+    dueDate: getFutureDate(-1),
+    tags: ['Marketing'],
+    subtasks: [],
+    attachments: [],
+    comments: [],
+    createdAt: getFutureDate(-5),
+  },
+  {
+    id: 't6',
+    projectId: 'p3',
+    title: 'Provision new database servers',
+    description: 'Set up the new database servers in the production environment.',
+    status: 'in-progress',
+    priority: 'high',
+    assigneeId: '2',
+    dueDate: getFutureDate(3),
+    tags: ['DevOps', 'Infrastructure'],
+    subtasks: [],
+    attachments: [],
+    comments: [],
+    createdAt: getFutureDate(-1),
+  },
+  {
+    id: 't7',
+    projectId: 'p1',
+    title: 'Write blog post announcing the redesign',
+    description: 'Draft a blog post for the company blog about the upcoming website redesign.',
+    status: 'todo',
+    priority: 'medium',
+    assigneeId: '1',
+    dueDate: getFutureDate(20),
+    tags: ['Content'],
+    subtasks: [],
+    attachments: [],
+    comments: [],
+    createdAt: getFutureDate(1),
+  },
+   {
+    id: 't8',
+    projectId: 'p2',
+    title: 'Develop user profile screen',
+    description: 'Build the UI for the user profile section of the mobile app.',
+    status: 'in-progress',
+    priority: 'medium',
+    assigneeId: '3',
+    dueDate: getFutureDate(8),
+    tags: ['iOS', 'Android', 'UI'],
+     subtasks: [
+      { id: 'st4', title: 'Layout implementation', isCompleted: true },
+      { id: 'st5', title: 'Connect to API', isCompleted: false },
+      { id: 'st6', title: 'Add avatar upload', isCompleted: false },
+    ],
+    attachments: [],
+    comments: [],
+    createdAt: getFutureDate(-4),
+  },
+  {
+    id: 't9',
+    projectId: 'p3',
+    title: 'Run load tests on new API endpoints',
+    description: 'Stress test the new infrastructure to ensure it meets performance requirements.',
+    status: 'todo',
+    priority: 'high',
+    assigneeId: '5',
+    dueDate: getFutureDate(10),
+    tags: ['Testing', 'Performance'],
+    subtasks: [],
+    attachments: [],
+    comments: [],
+    createdAt: getFutureDate(2),
+  },
+  {
+    id: 't10',
+    projectId: 'p1',
+    title: 'Update terms of service',
+    description: 'Legal review and update of the terms of service document.',
+    status: 'done',
+    priority: 'low',
+    dueDate: getFutureDate(-5),
+    tags: ['Legal'],
+    subtasks: [],
+    attachments: [],
+    comments: [],
+    createdAt: getFutureDate(-10),
+  },
+];
+
+export const notifications: Notification[] = [
+    {
+        id: 'n1',
+        message: 'Alice Johnson assigned you to "Fix authentication bug on Android".',
+        isRead: false,
+        createdAt: getFutureDate(-1),
+        link: '/project/p2/board'
+    },
+    {
+        id: 'n2',
+        message: 'A new comment was added to "Design new homepage mockups".',
+        isRead: false,
+        createdAt: getFutureDate(0),
+        link: '/project/p1/board'
+    },
+    {
+        id: 'n3',
+        message: 'The due date for "Provision new database servers" is tomorrow.',
+        isRead: true,
+        createdAt: getFutureDate(0),
+        link: '/project/p3/board'
+    },
+    {
+        id: 'n4',
+        message: 'Bob Williams completed the task "Finalize app store screenshots".',
+        isRead: true,
+        createdAt: getFutureDate(-1),
+        link: '/project/p2/board'
+    }
+]
