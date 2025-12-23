@@ -8,15 +8,13 @@ import {
   SidebarMenu,
   SidebarMenuItem,
   SidebarMenuButton,
-  SidebarFooter
+  SidebarFooter,
+  SidebarTrigger
 } from "@/components/ui/sidebar"
 import { Bell, Home, Settings, SquareKanban } from "lucide-react"
-import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar"
-import { users, projects } from "@/lib/placeholder-data"
+import { projects } from "@/lib/placeholder-data"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-
-const currentUser = users[0];
 
 export function AppSidebar() {
   const pathname = usePathname();
@@ -68,17 +66,7 @@ export function AppSidebar() {
           </SidebarGroup>
         </SidebarContent>
         <SidebarFooter>
-           <SidebarMenu>
-            <SidebarMenuItem>
-                <SidebarMenuButton tooltip={{children: currentUser.name, side: 'right'}}>
-                    <Avatar className="size-8">
-                        <AvatarImage src={currentUser.avatarUrl} alt={currentUser.name} />
-                        <AvatarFallback>{currentUser.name.charAt(0)}</AvatarFallback>
-                    </Avatar>
-                    <span className="truncate">{currentUser.name}</span>
-                </SidebarMenuButton>
-            </SidebarMenuItem>
-           </SidebarMenu>
+           <SidebarTrigger />
         </SidebarFooter>
       </Sidebar>
   )
