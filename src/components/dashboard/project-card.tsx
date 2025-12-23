@@ -38,7 +38,7 @@ export function ProjectCard({ project }: ProjectCardProps) {
       <CardContent className="flex-grow">
         {owner && (
            <div className="text-sm text-muted-foreground flex items-center gap-2">
-            <span className="font-medium">Owner:</span>
+            <span className="font-medium">Dono:</span>
             <Avatar className="size-6">
                 <AvatarImage src={owner.avatarUrl} alt={owner.name} />
                 <AvatarFallback>{owner.name.charAt(0)}</AvatarFallback>
@@ -49,7 +49,7 @@ export function ProjectCard({ project }: ProjectCardProps) {
       </CardContent>
       <CardFooter>
         <div className="flex items-center justify-between w-full">
-          <span className="text-sm text-muted-foreground">Members</span>
+          <span className="text-sm text-muted-foreground">Membros</span>
           <div className="flex -space-x-2">
             <TooltipProvider>
               {projectMembers.map((member) => (

@@ -7,18 +7,18 @@ import { Plus } from "lucide-react";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Dashboard",
+  title: "Painel",
 };
 
 export default function DashboardPage() {
   return (
     <AppLayout>
       <div className="flex items-center justify-between mb-8">
-        <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
+        <h1 className="text-3xl font-bold tracking-tight">Painel</h1>
         <NewProjectDialog>
           <Button className="hidden md:flex">
             <Plus className="mr-2 h-4 w-4" />
-            New Project
+            Novo Projeto
           </Button>
         </NewProjectDialog>
       </div>
@@ -31,7 +31,7 @@ export default function DashboardPage() {
         <NewProjectDialog>
             <Button size="icon" className="h-14 w-14 rounded-full shadow-lg">
                 <Plus className="h-6 w-6" />
-                <span className="sr-only">New Project</span>
+                <span className="sr-only">Novo Projeto</span>
             </Button>
         </NewProjectDialog>
       </div>

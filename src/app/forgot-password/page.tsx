@@ -10,23 +10,23 @@ export default function ForgotPasswordPage() {
     <AuthLayout>
       <Card>
         <CardHeader>
-          <CardTitle className="text-2xl">Forgot Password</CardTitle>
+          <CardTitle className="text-2xl">Esqueceu a Senha</CardTitle>
           <CardDescription>
-            Enter your email and we&apos;ll send you a link to reset your password.
+            Digite seu e-mail e enviaremos um link para redefinir sua senha.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="email">Email</Label>
-            <Input id="email" type="email" placeholder="m@example.com" required />
+            <Input id="email" type="email" placeholder="m@exemplo.com" required />
           </div>
         </CardContent>
         <CardFooter className="flex flex-col gap-4">
            <Button className="w-full" asChild>
-            <Link href="/login">Send reset link</Link>
+            <Link href="/login">Enviar link de redefinição</Link>
           </Button>
           <Button variant="link" asChild>
-            <Link href="/login">Back to log in</Link>
+            <Link href="/login">Voltar para o login</Link>
           </Button>
         </CardFooter>
       </Card>

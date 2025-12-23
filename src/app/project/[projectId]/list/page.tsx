@@ -2,7 +2,7 @@ import { TaskList } from "@/components/project/task-list";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "List",
+  title: "Lista",
 };
 
 export default function ProjectListPage({ params }: { params: { projectId: string } }) {

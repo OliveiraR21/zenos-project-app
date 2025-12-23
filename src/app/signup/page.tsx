@@ -22,15 +22,15 @@ export default function SignupPage() {
     <AuthLayout>
       <Card>
         <CardHeader>
-          <CardTitle className="text-2xl">Sign Up</CardTitle>
+          <CardTitle className="text-2xl">Cadastre-se</CardTitle>
           <CardDescription>
-            Create an account to start managing your projects.
+            Crie uma conta para começar a gerenciar seus projetos.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <Button variant="outline" className="w-full">
             <GoogleIcon />
-            Sign up with Google
+            Cadastre-se com Google
           </Button>
           <div className="relative">
             <div className="absolute inset-0 flex items-center">
@@ -38,31 +38,31 @@ export default function SignupPage() {
             </div>
             <div className="relative flex justify-center text-xs uppercase">
               <span className="bg-card px-2 text-muted-foreground">
-                Or continue with
+                Ou continue com
               </span>
             </div>
           </div>
           <div className="space-y-2">
-            <Label htmlFor="name">Name</Label>
-            <Input id="name" placeholder="John Doe" required />
+            <Label htmlFor="name">Nome</Label>
+            <Input id="name" placeholder="João da Silva" required />
           </div>
           <div className="space-y-2">
             <Label htmlFor="email">Email</Label>
-            <Input id="email" type="email" placeholder="m@example.com" required />
+            <Input id="email" type="email" placeholder="m@exemplo.com" required />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="password">Password</Label>
+            <Label htmlFor="password">Senha</Label>
             <Input id="password" type="password" required />
           </div>
         </CardContent>
         <CardFooter className="flex flex-col gap-4">
           <Button className="w-full" asChild>
-            <Link href="/dashboard">Create account</Link>
+            <Link href="/dashboard">Criar conta</Link>
           </Button>
           <div className="text-center text-sm">
-            Already have an account?{" "}
+            Já tem uma conta?{" "}
             <Link href="/login" className="underline">
-              Log in
+              Entrar
             </Link>
           </div>
         </CardFooter>

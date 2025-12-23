@@ -19,7 +19,7 @@ export function KanbanBoard({ projectId }: KanbanBoardProps) {
         <div className="flex items-center gap-4 mb-6">
             <Button variant="outline">
                 <Filter className="mr-2 h-4 w-4"/>
-                Filter
+                Filtrar
             </Button>
             {/* Add more filters like 'Only my tasks', 'Overdue' */}
         </div>

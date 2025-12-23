@@ -36,23 +36,23 @@ export function AppSidebar() {
         <SidebarContent>
           <SidebarMenu>
             <SidebarMenuItem>
-              <SidebarMenuButton asChild isActive={pathname === '/dashboard'} tooltip={{children: 'Dashboard'}}>
-                <Link href="/dashboard"><Home /><span>Dashboard</span></Link>
+              <SidebarMenuButton asChild isActive={pathname === '/dashboard'} tooltip={{children: 'Painel'}}>
+                <Link href="/dashboard"><Home /><span>Painel</span></Link>
               </SidebarMenuButton>
             </SidebarMenuItem>
             <SidebarMenuItem>
-              <SidebarMenuButton asChild isActive={pathname === '/notifications'} tooltip={{children: 'Notifications'}}>
-                <Link href="/notifications"><Bell /><span>Notifications</span></Link>
+              <SidebarMenuButton asChild isActive={pathname === '/notifications'} tooltip={{children: 'Notificações'}}>
+                <Link href="/notifications"><Bell /><span>Notificações</span></Link>
               </SidebarMenuButton>
             </SidebarMenuItem>
             <SidebarMenuItem>
-              <SidebarMenuButton asChild isActive={pathname === '/settings'} tooltip={{children: 'Settings'}}>
-                <Link href="/settings"><Settings /><span>Settings</span></Link>
+              <SidebarMenuButton asChild isActive={pathname === '/settings'} tooltip={{children: 'Configurações'}}>
+                <Link href="/settings"><Settings /><span>Configurações</span></Link>
               </SidebarMenuButton>
             </SidebarMenuItem>
           </SidebarMenu>
           <SidebarGroup className="mt-4">
-            <SidebarGroupLabel>Projects</SidebarGroupLabel>
+            <SidebarGroupLabel>Projetos</SidebarGroupLabel>
             <SidebarMenu>
               {projects.map((project) => (
                 <SidebarMenuItem key={project.id}>

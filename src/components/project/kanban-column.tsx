@@ -7,15 +7,14 @@ import { Input } from "../ui/input";
 
 interface KanbanColumnProps {
   status: TaskStatus;
-  title: string;
   tasks: Task[];
 }
 
 const statusTitles: Record<TaskStatus, string> = {
-  todo: "To Do",
-  "in-progress": "In Progress",
-  blocked: "Blocked",
-  done: "Done",
+  todo: "A Fazer",
+  "in-progress": "Em Progresso",
+  blocked: "Bloqueado",
+  done: "Concluído",
 };
 
 const statusColors: Record<TaskStatus, string> = {
@@ -53,7 +52,7 @@ export function KanbanColumn({ status, tasks }: KanbanColumnProps) {
                     }}
                 >
                 <div className="flex items-center gap-2">
-                    <Input name="title" placeholder="Add a new task..." className="bg-card/50 h-9" />
+                    <Input name="title" placeholder="Adicionar uma nova tarefa..." className="bg-card/50 h-9" />
                     <Button type="submit" size="icon" variant="ghost" className="shrink-0 h-9 w-9">
                         <Plus className="h-4 w-4" />
                     </Button>

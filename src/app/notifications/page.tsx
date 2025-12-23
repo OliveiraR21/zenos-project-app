@@ -7,18 +7,18 @@ import { cn } from "@/lib/utils";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Notifications",
+  title: "Notificações",
 };
 
 export default function NotificationsPage() {
   return (
     <AppLayout>
       <div className="mb-8">
-        <h1 className="text-3xl font-bold tracking-tight">Notifications</h1>
+        <h1 className="text-3xl font-bold tracking-tight">Notificações</h1>
       </div>
       <Card>
         <CardHeader>
-            <CardTitle>Your Updates</CardTitle>
+            <CardTitle>Suas Atualizações</CardTitle>
         </CardHeader>
         <CardContent>
             <div className="flow-root">
@@ -36,10 +36,10 @@ export default function NotificationsPage() {
                                     !notification.isRead && "bg-primary rounded-full animate-pulse"
                                 )}>
                                     <div className="h-8 w-8 bg-card rounded-full ring-8 ring-card flex items-center justify-center">
-                                        {notification.message.includes('assigned') && <UserCheck className="h-5 w-5 text-muted-foreground" />}
-                                        {notification.message.includes('comment') && <MessageSquare className="h-5 w-5 text-muted-foreground" />}
-                                        {notification.message.includes('due') && <Bell className="h-5 w-5 text-muted-foreground" />}
-                                        {notification.message.includes('completed') && <UserCheck className="h-5 w-5 text-muted-foreground" />}
+                                        {notification.message.includes('atribuiu') && <UserCheck className="h-5 w-5 text-muted-foreground" />}
+                                        {notification.message.includes('comentário') && <MessageSquare className="h-5 w-5 text-muted-foreground" />}
+                                        {notification.message.includes('vencimento') && <Bell className="h-5 w-5 text-muted-foreground" />}
+                                        {notification.message.includes('concluiu') && <UserCheck className="h-5 w-5 text-muted-foreground" />}
                                     </div>
                                 </div>
                             </div>

@@ -23,15 +23,15 @@ export default function LoginPage() {
     <AuthLayout>
       <Card>
         <CardHeader>
-          <CardTitle className="text-2xl">Login</CardTitle>
+          <CardTitle className="text-2xl">Entrar</CardTitle>
           <CardDescription>
-            Welcome back! Please enter your details.
+            Bem-vindo de volta! Por favor, insira seus dados.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <Button variant="outline" className="w-full">
             <GoogleIcon />
-            Sign in with Google
+            Entrar com Google
           </Button>
           <div className="relative">
             <div className="absolute inset-0 flex items-center">
@@ -39,22 +39,22 @@ export default function LoginPage() {
             </div>
             <div className="relative flex justify-center text-xs uppercase">
               <span className="bg-card px-2 text-muted-foreground">
-                Or continue with
+                Ou continue com
               </span>
             </div>
           </div>
           <div className="space-y-2">
             <Label htmlFor="email">Email</Label>
-            <Input id="email" type="email" placeholder="m@example.com" required />
+            <Input id="email" type="email" placeholder="m@exemplo.com" required />
           </div>
           <div className="space-y-2">
             <div className="flex items-center">
-              <Label htmlFor="password">Password</Label>
+              <Label htmlFor="password">Senha</Label>
               <Link
                 href="/forgot-password"
                 className="ml-auto inline-block text-sm underline"
               >
-                Forgot your password?
+                Esqueceu sua senha?
               </Link>
             </div>
             <Input id="password" type="password" required />
@@ -62,12 +62,12 @@ export default function LoginPage() {
         </CardContent>
         <CardFooter className="flex flex-col gap-4">
           <Button className="w-full" asChild>
-            <Link href="/dashboard">Log in</Link>
+            <Link href="/dashboard">Entrar</Link>
           </Button>
           <div className="text-center text-sm">
-            Don&apos;t have an account?{" "}
+            Não tem uma conta?{" "}
             <Link href="/signup" className="underline">
-              Sign up
+              Cadastre-se
             </Link>
           </div>
         </CardFooter>

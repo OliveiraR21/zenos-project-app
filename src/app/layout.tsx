@@ -7,7 +7,7 @@ export const metadata: Metadata = {
     default: "Zenos Project",
     template: `%s | Zenos Project`,
   },
-  description: 'Collaborate, manage projects, and reach new productivity peaks.',
+  description: 'Colabore, gerencie projetos e alcance novos picos de produtividade.',
 };
 
 export default function RootLayout({
@@ -16,7 +16,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="dark">
+    <html lang="pt-BR" className="dark">
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />

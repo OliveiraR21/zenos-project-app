@@ -80,7 +80,7 @@ export function TaskCard({ task }: TaskCardProps) {
                                 <div className={cn("size-3 rounded-full", priorityClasses[task.priority])} />
                                 </TooltipTrigger>
                                 <TooltipContent>
-                                    <p className="capitalize">{task.priority} priority</p>
+                                    <p className="capitalize">Prioridade {task.priority === 'low' ? 'baixa' : task.priority === 'medium' ? 'média' : 'alta'}</p>
                                 </TooltipContent>
                             </Tooltip>
                         </TooltipProvider>
@@ -95,7 +95,7 @@ export function TaskCard({ task }: TaskCardProps) {
                                         </Avatar>
                                     </TooltipTrigger>
                                     <TooltipContent>
-                                        <p>Assigned to {assignee.name}</p>
+                                        <p>Atribuído a {assignee.name}</p>
                                     </TooltipContent>
                                 </Tooltip>
                             </TooltipProvider>

@@ -8,18 +8,18 @@ import Link from 'next/link';
 const features = [
   {
     icon: <Blocks className="h-8 w-8 text-primary" />,
-    title: 'Visual Kanban Boards',
-    description: 'Drag and drop tasks through your workflow. See progress at a glance.',
+    title: 'Quadros Kanban Visuais',
+    description: 'Arraste e solte tarefas em seu fluxo de trabalho. Veja o progresso rapidamente.',
   },
   {
     icon: <ListTodo className="h-8 w-8 text-primary" />,
-    title: 'Powerful List View',
-    description: 'A detailed, table-style view of your tasks. Sort, filter, and edit inline.',
+    title: 'Visualização de Lista Poderosa',
+    description: 'Uma visualização detalhada de suas tarefas em estilo de tabela. Ordene, filtre e edite em linha.',
   },
   {
     icon: <CheckCircle className="h-8 w-8 text-primary" />,
-    title: 'Real-time Collaboration',
-    description: 'Work with your team in real-time. See who\'s online and what they\'re doing.',
+    title: 'Colaboração em Tempo Real',
+    description: 'Trabalhe com sua equipe em tempo real. Veja quem está online e o que estão fazendo.',
   },
 ];
 
@@ -38,24 +38,24 @@ export default function Home() {
         </Link>
         <nav className="flex items-center gap-4">
           <Button variant="ghost" asChild>
-            <Link href="/login">Log In</Link>
+            <Link href="/login">Entrar</Link>
           </Button>
           <Button asChild>
-            <Link href="/signup">Get Started <ArrowRight className="ml-2" /></Link>
+            <Link href="/signup">Comece Agora <ArrowRight className="ml-2" /></Link>
           </Button>
         </nav>
       </header>
       <main className="flex-grow">
         <section className="container mx-auto px-4 sm:px-6 lg:px-8 py-20 md:py-32 text-center">
           <h1 className="text-4xl md:text-6xl font-extrabold tracking-tighter mb-6 text-foreground">
-            Project Management, <span className="text-primary">Perfected</span>.
+            Gerenciamento de Projetos, <span className="text-primary">Aperfeiçoado</span>.
           </h1>
           <p className="max-w-2xl mx-auto text-lg md:text-xl text-muted-foreground mb-10">
-            Collaborate, manage projects, and reach new productivity peaks. From high rises to the home office, the way your team works is unique—accomplish it all with Zenos.
+            Colabore, gerencie projetos e alcance novos picos de produtividade. Dos arranha-céus ao escritório em casa, a maneira como sua equipe trabalha é única—realize tudo com o Zenos.
           </p>
           <Button size="lg" asChild>
             <Link href="/signup">
-              Get Started for Free
+              Comece de Graça
               <ArrowRight className="ml-2" />
             </Link>
           </Button>
@@ -78,9 +78,9 @@ export default function Home() {
         <section className="bg-card py-20 md:py-32">
           <div className="container mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center mb-12">
-              <h2 className="text-3xl md:text-4xl font-bold">Everything you need to move work forward</h2>
+              <h2 className="text-3xl md:text-4xl font-bold">Tudo que você precisa para fazer o trabalho avançar</h2>
               <p className="text-muted-foreground mt-4 max-w-2xl mx-auto">
-                Zenos is a flexible, all-in-one platform that helps you manage projects, organize tasks, and collaborate with your team.
+                Zenos é uma plataforma flexível e completa que ajuda você a gerenciar projetos, organizar tarefas e colaborar com sua equipe.
               </p>
             </div>
             <div className="grid md:grid-cols-3 gap-8">
@@ -100,7 +100,7 @@ export default function Home() {
         </section>
       </main>
       <footer className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 text-center text-muted-foreground">
-        <p>&copy; {new Date().getFullYear()} Zenos Project. All rights reserved.</p>
+        <p>&copy; {new Date().getFullYear()} Zenos Project. Todos os direitos reservados.</p>
       </footer>
     </div>
   );

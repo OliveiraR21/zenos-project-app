@@ -29,16 +29,16 @@ interface TaskDetailsSheetProps {
 }
 
 const statusOptions: {value: TaskStatus, label: string}[] = [
-    { value: "todo", label: "To Do" },
-    { value: "in-progress", label: "In Progress" },
-    { value: "blocked", label: "Blocked" },
-    { value: "done", label: "Done" },
+    { value: "todo", label: "A Fazer" },
+    { value: "in-progress", label: "Em Progresso" },
+    { value: "blocked", label: "Bloqueado" },
+    { value: "done", label: "Concluído" },
 ];
 
 const priorityOptions: {value: TaskPriority, label: string}[] = [
-    { value: "low", label: "Low" },
-    { value: "medium", label: "Medium" },
-    { value: "high", label: "High" },
+    { value: "low", label: "Baixa" },
+    { value: "medium", label: "Média" },
+    { value: "high", label: "Alta" },
 ];
 
 export function TaskDetailsSheet({ task, children }: TaskDetailsSheetProps) {
@@ -55,23 +55,23 @@ export function TaskDetailsSheet({ task, children }: TaskDetailsSheetProps) {
                 <SheetHeader>
                     <Input className="text-2xl font-semibold tracking-tight border-0 shadow-none focus-visible:ring-0 px-0" defaultValue={task.title} />
                     <SheetDescription>
-                        In project <a href="#" className="font-medium text-primary hover:underline">{task.projectId}</a>
+                        No projeto <a href="#" className="font-medium text-primary hover:underline">{task.projectId}</a>
                     </SheetDescription>
                 </SheetHeader>
                 <div className="py-8 grid gap-8">
                     {/* Description */}
                     <div className="grid gap-2">
-                        <h3 className="font-semibold flex items-center"><Type className="mr-2 size-4 text-muted-foreground"/> Description</h3>
+                        <h3 className="font-semibold flex items-center"><Type className="mr-2 size-4 text-muted-foreground"/> Descrição</h3>
                         <Textarea defaultValue={task.description} rows={4} className="bg-card"/>
                     </div>
 
                     {/* Details Grid */}
                     <div className="grid grid-cols-2 gap-x-8 gap-y-4">
                         <div className="space-y-2">
-                            <h4 className="font-medium text-sm text-muted-foreground flex items-center"><User className="mr-2 size-4"/>Assignee</h4>
+                            <h4 className="font-medium text-sm text-muted-foreground flex items-center"><User className="mr-2 size-4"/>Responsável</h4>
                             <Select defaultValue={assignee?.id}>
                                 <SelectTrigger>
-                                    <SelectValue placeholder="Select assignee" />
+                                    <SelectValue placeholder="Selecione o responsável" />
                                 </SelectTrigger>
                                 <SelectContent>
                                     {users.map(user => (
@@ -81,12 +81,12 @@ export function TaskDetailsSheet({ task, children }: TaskDetailsSheetProps) {
                             </Select>
                         </div>
                         <div className="space-y-2">
-                            <h4 className="font-medium text-sm text-muted-foreground flex items-center"><CalendarIcon className="mr-2 size-4"/>Due Date</h4>
+                            <h4 className="font-medium text-sm text-muted-foreground flex items-center"><CalendarIcon className="mr-2 size-4"/>Data de Vencimento</h4>
                             <Popover>
                                 <PopoverTrigger asChild>
                                     <Button variant="outline" className="w-full justify-start text-left font-normal">
                                         <CalendarIcon className="mr-2 h-4 w-4" />
-                                        {task.dueDate ? new Date(task.dueDate).toLocaleDateString() : <span>Pick a date</span>}
+                                        {task.dueDate ? new Date(task.dueDate).toLocaleDateString() : <span>Escolha uma data</span>}
                                     </Button>
                                 </PopoverTrigger>
                                 <PopoverContent className="w-auto p-0">
@@ -98,7 +98,7 @@ export function TaskDetailsSheet({ task, children }: TaskDetailsSheetProps) {
                             <h4 className="font-medium text-sm text-muted-foreground">Status</h4>
                              <Select defaultValue={task.status}>
                                 <SelectTrigger>
-                                    <SelectValue placeholder="Set status" />
+                                    <SelectValue placeholder="Definir status" />
                                 </SelectTrigger>
                                 <SelectContent>
                                     {statusOptions.map(opt => (
@@ -108,10 +108,10 @@ export function TaskDetailsSheet({ task, children }: TaskDetailsSheetProps) {
                             </Select>
                         </div>
                         <div className="space-y-2">
-                            <h4 className="font-medium text-sm text-muted-foreground">Priority</h4>
+                            <h4 className="font-medium text-sm text-muted-foreground">Prioridade</h4>
                             <Select defaultValue={task.priority}>
                                 <SelectTrigger>
-                                    <SelectValue placeholder="Set priority" />
+                                    <SelectValue placeholder="Definir prioridade" />
                                 </SelectTrigger>
                                 <SelectContent>
                                     {priorityOptions.map(opt => (
@@ -132,7 +132,7 @@ export function TaskDetailsSheet({ task, children }: TaskDetailsSheetProps) {
 
                     {/* Subtasks */}
                     <div className="grid gap-3">
-                        <h3 className="font-semibold flex items-center"><ListChecks className="mr-2 size-4 text-muted-foreground"/> Subtasks</h3>
+                        <h3 className="font-semibold flex items-center"><ListChecks className="mr-2 size-4 text-muted-foreground"/> Subtarefas</h3>
                         <Progress value={subtaskProgress} className="h-2" />
                         <div className="space-y-2">
                             {task.subtasks.map(subtask => (
@@ -146,8 +146,8 @@ export function TaskDetailsSheet({ task, children }: TaskDetailsSheetProps) {
 
                     {/* Attachments */}
                      <div className="grid gap-2">
-                        <h3 className="font-semibold flex items-center"><Paperclip className="mr-2 size-4 text-muted-foreground"/> Attachments</h3>
-                        <p className="text-sm text-muted-foreground">No attachments yet. <Button variant="link" className="p-0 h-auto">Add one</Button></p>
+                        <h3 className="font-semibold flex items-center"><Paperclip className="mr-2 size-4 text-muted-foreground"/> Anexos</h3>
+                        <p className="text-sm text-muted-foreground">Nenhum anexo ainda. <Button variant="link" className="p-0 h-auto">Adicionar um</Button></p>
                     </div>
 
                     <Separator />
@@ -155,7 +155,7 @@ export function TaskDetailsSheet({ task, children }: TaskDetailsSheetProps) {
                     {/* Comments */}
                     <div className="grid gap-4">
                         <div className="flex items-center justify-between">
-                            <h3 className="font-semibold">Activity</h3>
+                            <h3 className="font-semibold">Atividade</h3>
                             <div className="flex items-center -space-x-2">
                                 {viewingUsers.map(user => (
                                     <Avatar key={user.id} className="size-7 border-2 border-background">
@@ -171,9 +171,9 @@ export function TaskDetailsSheet({ task, children }: TaskDetailsSheetProps) {
                                 <AvatarFallback>{users[0].name.charAt(0)}</AvatarFallback>
                             </Avatar>
                             <div className="w-full">
-                                <Textarea placeholder="Write a comment..." className="mb-2 bg-card"/>
+                                <Textarea placeholder="Escreva um comentário..." className="mb-2 bg-card"/>
                                 <Button size="sm">
-                                    Send <Send className="ml-2 size-4"/>
+                                    Enviar <Send className="ml-2 size-4"/>
                                 </Button>
                             </div>
                         </div>

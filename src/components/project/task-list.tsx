@@ -26,6 +26,12 @@ const priorityClasses: Record<Task['priority'], string> = {
     high: 'bg-red-500/20 text-red-400',
 };
 
+const priorityLabels: Record<Task['priority'], string> = {
+    low: 'Baixa',
+    medium: 'Média',
+    high: 'Alta',
+};
+
 function TaskRow({ task }: { task: Task }) {
     const assignee = users.find((user) => user.id === task.assigneeId);
     const dueDate = task.dueDate ? new Date(task.dueDate) : null;
@@ -55,7 +61,7 @@ function TaskRow({ task }: { task: Task }) {
                 <TableCell>
                     <div className="flex items-center gap-2">
                         <div className={cn("size-3 rounded-full", priorityClasses[task.priority])} />
-                        <span className="capitalize">{task.priority}</span>
+                        <span className="capitalize">{priorityLabels[task.priority]}</span>
                     </div>
                 </TableCell>
             </TableRow>
@@ -73,22 +79,22 @@ export function TaskList({ projectId }: TaskListProps) {
                     <TableHead className="w-12"><Checkbox /></TableHead>
                     <TableHead>
                         <Button variant="ghost">
-                            Task Name <ArrowUpDown className="ml-2 h-4 w-4" />
+                            Nome da Tarefa <ArrowUpDown className="ml-2 h-4 w-4" />
                         </Button>
                     </TableHead>
                     <TableHead>
                         <Button variant="ghost">
-                            Assignee <ArrowUpDown className="ml-2 h-4 w-4" />
+                            Responsável <ArrowUpDown className="ml-2 h-4 w-4" />
                         </Button>
                     </TableHead>
                     <TableHead>
                         <Button variant="ghost">
-                            Due Date <ArrowUpDown className="ml-2 h-4 w-4" />
+                            Data de Vencimento <ArrowUpDown className="ml-2 h-4 w-4" />
                         </Button>
                     </TableHead>
                     <TableHead>
                          <Button variant="ghost">
-                            Priority <ArrowUpDown className="ml-2 h-4 w-4" />
+                            Prioridade <ArrowUpDown className="ml-2 h-4 w-4" />
                         </Button>
                     </TableHead>
                 </TableRow>

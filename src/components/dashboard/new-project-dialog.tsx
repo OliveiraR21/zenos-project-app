@@ -18,31 +18,31 @@ export function NewProjectDialog({ children }: { children: React.ReactNode }) {
       <DialogTrigger asChild>{children}</DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>Create New Project</DialogTitle>
+          <DialogTitle>Criar Novo Projeto</DialogTitle>
           <DialogDescription>
-            Give your new project a name and description to get started.
+            Dê um nome e uma descrição ao seu novo projeto para começar.
           </DialogDescription>
         </DialogHeader>
         <div className="grid gap-4 py-4">
           <div className="grid grid-cols-4 items-center gap-4">
             <Label htmlFor="name" className="text-right">
-              Name
+              Nome
             </Label>
-            <Input id="name" placeholder="E.g. Website Redesign" className="col-span-3" />
+            <Input id="name" placeholder="Ex: Redesenho do Site" className="col-span-3" />
           </div>
           <div className="grid grid-cols-4 items-center gap-4">
             <Label htmlFor="description" className="text-right">
-              Description
+              Descrição
             </Label>
             <Textarea
               id="description"
-              placeholder="A short description of your project."
+              placeholder="Uma breve descrição do seu projeto."
               className="col-span-3"
             />
           </div>
         </div>
         <DialogFooter>
-          <Button type="submit">Create Project</Button>
+          <Button type="submit">Criar Projeto</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

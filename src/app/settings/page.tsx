@@ -8,7 +8,7 @@ import { users } from "@/lib/placeholder-data";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Settings",
+  title: "Configurações",
 };
 
 const currentUser = users[0];
@@ -17,26 +17,26 @@ export default function SettingsPage() {
   return (
     <AppLayout>
         <div className="mb-8">
-            <h1 className="text-3xl font-bold tracking-tight">Settings</h1>
-            <p className="text-muted-foreground">Manage your account and preferences.</p>
+            <h1 className="text-3xl font-bold tracking-tight">Configurações</h1>
+            <p className="text-muted-foreground">Gerencie sua conta e preferências.</p>
         </div>
         <Tabs defaultValue="profile" className="w-full">
             <TabsList className="grid w-full max-w-lg grid-cols-3">
-                <TabsTrigger value="profile">Profile</TabsTrigger>
-                <TabsTrigger value="appearance">Appearance</TabsTrigger>
-                <TabsTrigger value="notifications">Notifications</TabsTrigger>
+                <TabsTrigger value="profile">Perfil</TabsTrigger>
+                <TabsTrigger value="appearance">Aparência</TabsTrigger>
+                <TabsTrigger value="notifications">Notificações</TabsTrigger>
             </TabsList>
             <TabsContent value="profile">
                 <Card>
                     <CardHeader>
-                        <CardTitle>Profile</CardTitle>
+                        <CardTitle>Perfil</CardTitle>
                         <CardDescription>
-                            This is how others will see you on the site.
+                            É assim que os outros verão você no site.
                         </CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-4">
                         <div className="space-y-2">
-                            <Label htmlFor="name">Name</Label>
+                            <Label htmlFor="name">Nome</Label>
                             <Input id="name" defaultValue={currentUser.name} />
                         </div>
                         <div className="space-y-2">
@@ -45,33 +45,33 @@ export default function SettingsPage() {
                         </div>
                     </CardContent>
                     <CardFooter>
-                        <Button>Save changes</Button>
+                        <Button>Salvar alterações</Button>
                     </CardFooter>
                 </Card>
             </TabsContent>
             <TabsContent value="appearance">
                  <Card>
                     <CardHeader>
-                        <CardTitle>Appearance</CardTitle>
+                        <CardTitle>Aparência</CardTitle>
                         <CardDescription>
-                            Customize the look and feel of the app.
+                            Personalize a aparência do aplicativo.
                         </CardDescription>
                     </CardHeader>
                     <CardContent>
-                        <p className="text-muted-foreground">Appearance settings coming soon.</p>
+                        <p className="text-muted-foreground">Configurações de aparência em breve.</p>
                     </CardContent>
                 </Card>
             </TabsContent>
             <TabsContent value="notifications">
                  <Card>
                     <CardHeader>
-                        <CardTitle>Notifications</CardTitle>
+                        <CardTitle>Notificações</CardTitle>
                         <CardDescription>
-                            Configure how you receive notifications.
+                            Configure como você recebe notificações.
                         </CardDescription>
                     </CardHeader>
                     <CardContent>
-                        <p className="text-muted-foreground">Notification settings coming soon.</p>
+                        <p className="text-muted-foreground">Configurações de notificação em breve.</p>
                     </CardContent>
                 </Card>
             </TabsContent>
