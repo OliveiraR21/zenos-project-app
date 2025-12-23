@@ -42,8 +42,18 @@ export const projects: Project[] = [
   },
 ];
 
-const now = new Date();
-const getFutureDate = (days: number) => new Date(now.setDate(now.getDate() + days)).toISOString();
+
+const getFutureDate = (days: number) => {
+    const date = new Date();
+    date.setDate(date.getDate() + days);
+    return date.toISOString();
+};
+
+const getPastDate = (days: number) => {
+    const date = new Date();
+    date.setDate(date.getDate() - days);
+    return date.toISOString();
+}
 
 export const tasks: Task[] = [
   {
@@ -63,10 +73,10 @@ export const tasks: Task[] = [
     ],
     attachments: [],
     comments: [
-        { id: 'c1', content: "Aqui estão os primeiros rascunhos, me digam o que acham!", authorId: '4', createdAt: getFutureDate(-1)},
-        { id: 'c2', content: "Ficou ótimo! Podemos tentar uma versão com o CTA principal mais para cima?", authorId: '1', createdAt: getFutureDate(0)},
+        { id: 'c1', content: "Aqui estão os primeiros rascunhos, me digam o que acham!", authorId: '4', createdAt: getPastDate(1)},
+        { id: 'c2', content: "Ficou ótimo! Podemos tentar uma versão com o CTA principal mais para cima?", authorId: '1', createdAt: getPastDate(0)},
     ],
-    createdAt: getFutureDate(-2),
+    createdAt: getPastDate(2),
   },
   {
     id: 't2',
@@ -81,7 +91,7 @@ export const tasks: Task[] = [
     subtasks: [],
     attachments: [],
     comments: [],
-    createdAt: getFutureDate(-1),
+    createdAt: getPastDate(1),
   },
   {
     id: 't3',
@@ -96,7 +106,7 @@ export const tasks: Task[] = [
     subtasks: [],
     attachments: [],
     comments: [],
-    createdAt: getFutureDate(0),
+    createdAt: getPastDate(0),
   },
   {
     id: 't4',
@@ -111,9 +121,9 @@ export const tasks: Task[] = [
     subtasks: [],
     attachments: [],
     comments: [
-        {id: 'c3', content: "Estou bloqueado nisso até que a nova API de backend seja implantada.", authorId: '5', createdAt: getFutureDate(0)}
+        {id: 'c3', content: "Estou bloqueado nisso até que a nova API de backend seja implantada.", authorId: '5', createdAt: getPastDate(0)}
     ],
-    createdAt: getFutureDate(-3),
+    createdAt: getPastDate(3),
   },
   {
     id: 't5',
@@ -123,12 +133,12 @@ export const tasks: Task[] = [
     status: 'done',
     priority: 'low',
     assigneeId: '3',
-    dueDate: getFutureDate(-1),
+    dueDate: getPastDate(1),
     tags: ['Marketing'],
     subtasks: [],
     attachments: [],
     comments: [],
-    createdAt: getFutureDate(-5),
+    createdAt: getPastDate(5),
   },
   {
     id: 't6',
@@ -143,7 +153,7 @@ export const tasks: Task[] = [
     subtasks: [],
     attachments: [],
     comments: [],
-    createdAt: getFutureDate(-1),
+    createdAt: getPastDate(1),
   },
   {
     id: 't7',
@@ -177,7 +187,7 @@ export const tasks: Task[] = [
     ],
     attachments: [],
     comments: [],
-    createdAt: getFutureDate(-4),
+    createdAt: getPastDate(4),
   },
   {
     id: 't9',
@@ -201,12 +211,12 @@ export const tasks: Task[] = [
     description: 'Revisão legal e atualização do documento de termos de serviço.',
     status: 'done',
     priority: 'low',
-    dueDate: getFutureDate(-5),
+    dueDate: getPastDate(5),
     tags: ['Legal'],
     subtasks: [],
     attachments: [],
     comments: [],
-    createdAt: getFutureDate(-10),
+    createdAt: getPastDate(10),
   },
 ];
 
@@ -215,28 +225,28 @@ export const notifications: Notification[] = [
         id: 'n1',
         message: 'Alice Johnson atribuiu a você "Corrigir bug de autenticação no Android".',
         isRead: false,
-        createdAt: getFutureDate(-1),
+        createdAt: getPastDate(1),
         link: '/project/p2/board'
     },
     {
         id: 'n2',
         message: 'Um novo comentário foi adicionado a "Desenhar mockups da nova homepage".',
         isRead: false,
-        createdAt: getFutureDate(0),
+        createdAt: getPastDate(0),
         link: '/project/p1/board'
     },
     {
         id: 'n3',
         message: 'A data de vencimento para "Provisionar novos servidores de banco de dados" é amanhã.',
         isRead: true,
-        createdAt: getFutureDate(0),
+        createdAt: getPastDate(0),
         link: '/project/p3/board'
     },
     {
         id: 'n4',
         message: 'Bob Williams concluiu a tarefa "Finalizar capturas de tela da loja de aplicativos".',
         isRead: true,
-        createdAt: getFutureDate(-1),
+        createdAt: getPastDate(1),
         link: '/project/p2/board'
     }
 ]

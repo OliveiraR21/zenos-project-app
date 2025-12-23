@@ -15,6 +15,7 @@ import { ArrowUpDown } from "lucide-react";
 import { Button } from "../ui/button";
 import { Checkbox } from "../ui/checkbox";
 import { TaskDetailsSheet } from "./task-details-sheet";
+import { useEffect, useState } from "react";
   
 interface TaskListProps {
     projectId: string;
@@ -34,8 +35,15 @@ const priorityLabels: Record<Task['priority'], string> = {
 
 function TaskRow({ task }: { task: Task }) {
     const assignee = users.find((user) => user.id === task.assigneeId);
-    const dueDate = task.dueDate ? new Date(task.dueDate) : null;
-    const isOverdue = dueDate && dueDate < new Date();
+    
+    const [dueDate, setDueDate] = useState<Date | null>(null);
+    const [isOverdue, setIsOverdue] = useState(false);
+
+    useEffect(() => {
+        const date = task.dueDate ? new Date(task.dueDate) : null;
+        setDueDate(date);
+        setIsOverdue(date ? date < new Date() : false);
+    }, [task.dueDate]);
 
     return (
         <TaskDetailsSheet task={task}>

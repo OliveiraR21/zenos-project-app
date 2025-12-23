@@ -19,6 +19,7 @@ import {
   } from "@/components/ui/tooltip";
 import { TaskDetailsSheet } from "./task-details-sheet";
 import { Badge } from "../ui/badge";
+import { useEffect, useState } from "react";
 
 interface TaskCardProps {
     task: Task;
@@ -33,8 +34,15 @@ const priorityClasses: Record<Task['priority'], string> = {
 export function TaskCard({ task }: TaskCardProps) {
     const assignee = users.find((user) => user.id === task.assigneeId);
     
-    const dueDate = task.dueDate ? new Date(task.dueDate) : null;
-    const isOverdue = dueDate && dueDate < new Date();
+    const [dueDate, setDueDate] = useState<Date | null>(null);
+    const [isOverdue, setIsOverdue] = useState(false);
+
+    useEffect(() => {
+        const date = task.dueDate ? new Date(task.dueDate) : null;
+        setDueDate(date);
+        setIsOverdue(date ? date < new Date() : false);
+    }, [task.dueDate]);
+
 
     return (
         <TaskDetailsSheet task={task}>
