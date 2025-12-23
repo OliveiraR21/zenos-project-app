@@ -1,21 +1,22 @@
-"use client"
 import { AppLayout } from "@/components/app-layout";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { projects } from "@/lib/placeholder-data";
 import { notFound, usePathname } from "next/navigation";
 import Link from "next/link";
 import { ListTodo, Trello } from "lucide-react";
+import React from 'react';
 
-
-export default function ProjectLayout({
+function ProjectClientLayout({
   children,
-  params,
+  projectId,
 }: {
   children: React.ReactNode;
-  params: { projectId: string };
+  projectId: string;
 }) {
+  "use client"
+  
   const pathname = usePathname();
-  const project = projects.find((p) => p.id === params.projectId);
+  const project = projects.find((p) => p.id === projectId);
 
   if (!project) {
     notFound();
@@ -46,5 +47,22 @@ export default function ProjectLayout({
         </div>
       </Tabs>
     </AppLayout>
+  );
+}
+
+
+export default function ProjectLayout({
+  children,
+  params,
+}: {
+  children: React.ReactNode;
+  params: { projectId: string };
+}) {
+  const { projectId } = params;
+
+  return (
+    <ProjectClientLayout projectId={projectId}>
+      {children}
+    </ProjectClientLayout>
   );
 }
