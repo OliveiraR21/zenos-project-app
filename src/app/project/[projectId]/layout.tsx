@@ -2,22 +2,27 @@
 
 import { AppLayout } from "@/components/app-layout";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { usePathname } from "next/navigation";
+import { projects } from "@/lib/placeholder-data";
+import { notFound, usePathname } from "next/navigation";
 import Link from "next/link";
 import { ListTodo, Trello } from "lucide-react";
 import React from 'react';
-import type { Project } from "@/lib/types";
 
 export default function ProjectLayout({
   children,
   params,
-  project
 }: {
   children: React.ReactNode;
   params: { projectId: string };
-  project: Project
 }) {
+  const projectId = params.projectId;
   const pathname = usePathname();
+  const project = projects.find((p) => p.id === projectId);
+
+  if (!project) {
+    notFound();
+  }
+
   const activeTab = pathname.includes("/list") ? "list" : "board";
 
   const headerContent = (
