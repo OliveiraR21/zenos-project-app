@@ -1,0 +1,481 @@
+{
+  "entities": {
+    "User": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "User",
+      "type": "object",
+      "description": "Represents a user in the system.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the user."
+        },
+        "email": {
+          "type": "string",
+          "description": "Email address of the user.",
+          "format": "email"
+        },
+        "displayName": {
+          "type": "string",
+          "description": "The display name of the user."
+        },
+        "photoURL": {
+          "type": "string",
+          "description": "URL of the user's profile photo, stored in Firebase Storage.",
+          "format": "uri"
+        }
+      },
+      "required": [
+        "id",
+        "email",
+        "displayName"
+      ]
+    },
+    "Project": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Project",
+      "type": "object",
+      "description": "Represents a project in the system.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the project."
+        },
+        "name": {
+          "type": "string",
+          "description": "Name of the project."
+        },
+        "description": {
+          "type": "string",
+          "description": "Description of the project."
+        },
+        "ownerId": {
+          "type": "string",
+          "description": "Reference to User. (Relationship: User 1:N Project).  The user who owns/created the project."
+        },
+        "memberIds": {
+          "type": "array",
+          "description": "References to Users. (Relationship: Project N:N User). Users that are members of the project.",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "ownerId"
+      ]
+    },
+    "Task": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Task",
+      "type": "object",
+      "description": "Represents a task within a project.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the task."
+        },
+        "projectId": {
+          "type": "string",
+          "description": "Reference to Project. (Relationship: Project 1:N Task). The project this task belongs to."
+        },
+        "name": {
+          "type": "string",
+          "description": "Name of the task."
+        },
+        "description": {
+          "type": "string",
+          "description": "Detailed description of the task (rich text)."
+        },
+        "status": {
+          "type": "string",
+          "description": "Status of the task (e.g., To Do, In Progress, Blocked, Done)."
+        },
+        "assigneeId": {
+          "type": "string",
+          "description": "Reference to User. (Relationship: User 1:N Task).  The user assigned to the task."
+        },
+        "dueDate": {
+          "type": "string",
+          "description": "Due date for the task.",
+          "format": "date-time"
+        },
+        "priority": {
+          "type": "string",
+          "description": "Priority of the task (e.g., High, Medium, Low)."
+        },
+        "tagIds": {
+          "type": "array",
+          "description": "References to Tags. (Relationship: Task N:N Tag)",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "id",
+        "projectId",
+        "name",
+        "status"
+      ]
+    },
+    "Tag": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Tag",
+      "type": "object",
+      "description": "Represents a tag that can be associated with tasks.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the tag."
+        },
+        "name": {
+          "type": "string",
+          "description": "Name of the tag."
+        },
+        "color": {
+          "type": "string",
+          "description": "Color associated with the tag (e.g., hex code)."
+        }
+      },
+      "required": [
+        "id",
+        "name"
+      ]
+    },
+    "Subtask": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Subtask",
+      "type": "object",
+      "description": "Represents a subtask within a task.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the subtask."
+        },
+        "taskId": {
+          "type": "string",
+          "description": "Reference to Task. (Relationship: Task 1:N Subtask). The task this subtask belongs to."
+        },
+        "name": {
+          "type": "string",
+          "description": "Name of the subtask."
+        },
+        "isCompleted": {
+          "type": "boolean",
+          "description": "Indicates whether the subtask is completed."
+        }
+      },
+      "required": [
+        "id",
+        "taskId",
+        "name",
+        "isCompleted"
+      ]
+    },
+    "Attachment": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Attachment",
+      "type": "object",
+      "description": "Represents a file attachment for a task.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the attachment."
+        },
+        "taskId": {
+          "type": "string",
+          "description": "Reference to Task. (Relationship: Task 1:N Attachment).  The task this attachment belongs to."
+        },
+        "fileName": {
+          "type": "string",
+          "description": "Name of the file."
+        },
+        "fileURL": {
+          "type": "string",
+          "description": "URL of the file in Firebase Storage.",
+          "format": "uri"
+        },
+        "mimeType": {
+          "type": "string",
+          "description": "The mime type of the attached file"
+        }
+      },
+      "required": [
+        "id",
+        "taskId",
+        "fileName",
+        "fileURL"
+      ]
+    },
+    "Comment": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Comment",
+      "type": "object",
+      "description": "Represents a comment on a task.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the comment."
+        },
+        "taskId": {
+          "type": "string",
+          "description": "Reference to Task. (Relationship: Task 1:N Comment). The task this comment belongs to."
+        },
+        "authorId": {
+          "type": "string",
+          "description": "Reference to User. (Relationship: User 1:N Comment).  The user who authored the comment."
+        },
+        "text": {
+          "type": "string",
+          "description": "Text content of the comment."
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Timestamp indicating when the comment was created.",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "taskId",
+        "authorId",
+        "text",
+        "createdAt"
+      ]
+    },
+    "Notification": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Notification",
+      "type": "object",
+      "description": "Represents a notification for a user.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the notification."
+        },
+        "userId": {
+          "type": "string",
+          "description": "Reference to User. (Relationship: User 1:N Notification). The user this notification is for."
+        },
+        "message": {
+          "type": "string",
+          "description": "Text content of the notification."
+        },
+        "taskId": {
+          "type": "string",
+          "description": "Reference to Task.  The relevant task (if any)."
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Timestamp indicating when the notification was created.",
+          "format": "date-time"
+        },
+        "isRead": {
+          "type": "boolean",
+          "description": "Indicates whether the notification has been read."
+        }
+      },
+      "required": [
+        "id",
+        "userId",
+        "message",
+        "createdAt",
+        "isRead"
+      ]
+    }
+  },
+  "auth": {
+    "providers": [
+      "password",
+      "anonymous"
+    ]
+  },
+  "firestore": {
+    "structure": [
+      {
+        "path": "/users/{userId}",
+        "definition": {
+          "entityName": "User",
+          "schema": {
+            "$ref": "#/backend/entities/User"
+          },
+          "description": "Stores user profile information.  Path-based ownership enforced.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique identifier of the user."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/projects/{projectId}",
+        "definition": {
+          "entityName": "Project",
+          "schema": {
+            "$ref": "#/backend/entities/Project"
+          },
+          "description": "Stores project information. Includes 'ownerId' and 'memberIds' for authorization.",
+          "params": [
+            {
+              "name": "projectId",
+              "description": "The unique identifier of the project."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/projects/{projectId}/tasks/{taskId}",
+        "definition": {
+          "entityName": "Task",
+          "schema": {
+            "$ref": "#/backend/entities/Task"
+          },
+          "description": "Stores task information. Includes denormalized 'memberIds' from the parent project for authorization independence.",
+          "params": [
+            {
+              "name": "projectId",
+              "description": "The unique identifier of the project."
+            },
+            {
+              "name": "taskId",
+              "description": "The unique identifier of the task."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/projects/{projectId}/tasks/{taskId}/subtasks/{subtaskId}",
+        "definition": {
+          "entityName": "Subtask",
+          "schema": {
+            "$ref": "#/backend/entities/Subtask"
+          },
+          "description": "Stores subtask information for a task.",
+          "params": [
+            {
+              "name": "projectId",
+              "description": "The unique identifier of the project."
+            },
+            {
+              "name": "taskId",
+              "description": "The unique identifier of the task."
+            },
+            {
+              "name": "subtaskId",
+              "description": "The unique identifier of the subtask."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/projects/{projectId}/tasks/{taskId}/attachments/{attachmentId}",
+        "definition": {
+          "entityName": "Attachment",
+          "schema": {
+            "$ref": "#/backend/entities/Attachment"
+          },
+          "description": "Stores attachment information for a task.",
+          "params": [
+            {
+              "name": "projectId",
+              "description": "The unique identifier of the project."
+            },
+            {
+              "name": "taskId",
+              "description": "The unique identifier of the task."
+            },
+            {
+              "name": "attachmentId",
+              "description": "The unique identifier of the attachment."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/projects/{projectId}/tasks/{taskId}/comments/{commentId}",
+        "definition": {
+          "entityName": "Comment",
+          "schema": {
+            "$ref": "#/backend/entities/Comment"
+          },
+          "description": "Stores comments for a task.",
+          "params": [
+            {
+              "name": "projectId",
+              "description": "The unique identifier of the project."
+            },
+            {
+              "name": "taskId",
+              "description": "The unique identifier of the task."
+            },
+            {
+              "name": "commentId",
+              "description": "The unique identifier of the comment."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/users/{userId}/notifications/{notificationId}",
+        "definition": {
+          "entityName": "Notification",
+          "schema": {
+            "$ref": "#/backend/entities/Notification"
+          },
+          "description": "Stores notifications for a user. Path-based ownership enforced.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique identifier of the user."
+            },
+            {
+              "name": "notificationId",
+              "description": "The unique identifier of the notification."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/tags/{tagId}",
+        "definition": {
+          "entityName": "Tag",
+          "schema": {
+            "$ref": "#/backend/entities/Tag"
+          },
+          "description": "Stores tag information.  Tags are global, not project-specific.",
+          "params": [
+            {
+              "name": "tagId",
+              "description": "The unique identifier of the tag."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/presence/{taskId}/{userId}",
+        "definition": {
+          "entityName": "Presence",
+          "schema": {
+            "$ref": "#/backend/entities/User"
+          },
+          "description": "Stores presence information (who is viewing a task) for real-time updates.  No schema is explicitly defined, so reusing the User schema.",
+          "params": [
+            {
+              "name": "taskId",
+              "description": "The unique identifier of the task."
+            },
+            {
+              "name": "userId",
+              "description": "The unique identifier of the user."
+            }
+          ]
+        }
+      }
+    ],
+    "reasoning": "This Firestore structure prioritizes authorization independence and efficient data access for the Zenos Project application. It leverages path-based ownership and membership maps to avoid complex `get()` calls in security rules.  The structure supports the core features of the application, including real-time presence and intelligent notifications, while adhering to the principles of clarity, predictability, and scalability.\n\n**Authorization Independence:** Authorization independence is achieved through denormalization. Project member information is denormalized into the `tasks` collection, enabling task-level authorization without needing to fetch project documents. This is crucial for atomic operations and simplifies security rules.  The presence of `memberIds` within Project documents and the denormalization into `tasks` enables listing projects a user is a member of, as well as tasks assigned or related to members of a project.\n\n**Structural Segregation:**  The structure segregates data with different security needs. User profiles are stored in a private collection (`/users/{userId}`), while project and task data are organized in separate collections to allow for more granular access control.\n\n**Access Modeling:**  Path-based ownership is used for user-specific data (e.g., `/users/{userId}/notifications/{notificationId}`). Membership maps are used for collaborative data, with `memberIds` in the `/projects/{projectId}` document.\n\n**QAPs Support:**\n\n*   **List Projects:** A user can list projects they own or are members of by querying the `/projects` collection and filtering based on the `ownerId` or `memberIds` array.\n*   **List Tasks:** A user can list tasks within a project by querying the `/projects/{projectId}/tasks` collection. Denormalization of `memberIds` into tasks enable simple rules to guarantee QAPs.\n*   **Secure Task Access:** Access to individual tasks is controlled by the `assigneeId` and project `memberIds`. Security rules can easily enforce that only the assignee or project members can read/write a task.\n\n**Real-time Presence:**  Presence data (who is viewing a task) is stored in a separate collection (`/presence/{taskId}/{userId}`), allowing for real-time updates without affecting the main task data.\n\n**Intelligent Notifications:** Notifications are stored in a user-specific collection (`/users/{userId}/notifications/{notificationId}`), ensuring that only the intended user can access their notifications.\n\n**Search:** Global search would ideally be handled by a dedicated search index (Algolia as suggested), but a simple implementation could be achieved using collection group queries and client-side filtering (though this is not scalable for large datasets)."
+  }
+}

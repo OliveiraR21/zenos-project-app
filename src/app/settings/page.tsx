@@ -21,9 +21,8 @@ export default function SettingsPage() {
             <p className="text-muted-foreground">Gerencie sua conta e preferências.</p>
         </div>
         <Tabs defaultValue="profile" className="w-full">
-            <TabsList className="grid w-full max-w-lg grid-cols-3">
+            <TabsList className="grid w-full max-w-lg grid-cols-2">
                 <TabsTrigger value="profile">Perfil</TabsTrigger>
-                <TabsTrigger value="appearance">Aparência</TabsTrigger>
                 <TabsTrigger value="notifications">Notificações</TabsTrigger>
             </TabsList>
             <TabsContent value="profile">
@@ -47,19 +46,6 @@ export default function SettingsPage() {
                     <CardFooter>
                         <Button>Salvar alterações</Button>
                     </CardFooter>
-                </Card>
-            </TabsContent>
-            <TabsContent value="appearance">
-                 <Card>
-                    <CardHeader>
-                        <CardTitle>Aparência</CardTitle>
-                        <CardDescription>
-                            Personalize a aparência do aplicativo.
-                        </CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                        <p className="text-muted-foreground">Configurações de aparência em breve.</p>
-                    </CardContent>
                 </Card>
             </TabsContent>
             <TabsContent value="notifications">

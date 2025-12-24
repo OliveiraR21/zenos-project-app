@@ -1,0 +1,202 @@
+/**
+ * Core Philosophy: This ruleset enforces a collaborative, project-based security model.
+ * Access to shared resources like tasks, comments, and attachments is primarily determined
+ * by a user's membership in a parent project. User-specific data, such as profiles and
+ * notifications, is strictly private and only accessible by the owner.
+ *
+ * Data Structure: The data is organized hierarchically. Core collaborative work happens
+ * under the `/projects/{projectId}` collection. Each user also has a private data tree
+ * at `/users/{userId}` for their profile and notifications. Top-level collections like
+ * `/tags` store global, shared data.
+ *
+ * Key Security Decisions:
+ * - Project Membership: A user is considered a member of a project if their UID is present
+ *   in the project's `ownerId` field or its `memberIds` array.
+ * - Inherited Access: Security for nested subcollections (like tasks, comments, subtasks)
+ *   is inherited from the parent project. A `get()` call to the parent project document
+ *   is used to verify membership before allowing access. This is secure but has a minor
+ *   performance cost.
+ * - User Privacy: User data is strictly segregated. Users cannot list or view other
+ *   users' profiles or notifications.
+ * - Immutable Ownership: Critical relational fields, such as `ownerId` on projects or
+ *   `authorId` on comments, are immutable after creation to maintain data integrity.
+ * - Presence Security: The `/presence` collection has restricted reads due to a data
+ *   structure that prevents securely linking a task back to its project. Writes are
+ *   limited to the user themselves. For secure reads, the data path should be nested
+ *   under a project (e.g., /projects/{projectId}/tasks/{taskId}/presence/{userId}).
+ *
+ * Denormalization for Authorization: To optimize performance and simplify rules, the
+ * application should denormalize the project's `memberIds` array directly onto each `task`
+ * document. While the current ruleset uses a `get()` call for security, denormalization
+ * would eliminate this extra read, leading to faster and more cost-effective security
+ * enforcement.
+ *
+ * Structural Segregation: User-private data (`/users`) is stored separately from collaborative
+ * project data (`/projects`), creating a clear and secure boundary that simplifies list
+ * queries and prevents accidental data leakage.
+ */
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Helper functions for reusable logic
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return request.auth.uid == userId;
+    }
+
+    // Checks if a document exists for update/delete operations.
+    function isExistingDoc() {
+      return resource != null;
+    }
+
+    // Checks if the requesting user is the owner or a member of a given project.
+    // This requires a 'get' operation, which has a small performance/cost impact.
+    function isProjectMember(projectId) {
+      let projectData = get(/databases/$(database)/documents/projects/$(projectId)).data;
+      return request.auth.uid == projectData.ownerId || request.auth.uid in projectData.memberIds;
+    }
+
+    /**
+     * @description Controls access to user profile documents.
+     * @path /users/{userId}
+     * @allow (create) A new user signing up: auth.uid matches {userId}.
+     * @allow (get) An authenticated user reading their own profile.
+     * @deny (list) Any user attempting to list all users in the system.
+     * @deny (update) A user trying to modify another user's profile.
+     * @principle Restricts access to a user's own data tree.
+     */
+    match /users/{userId} {
+      allow get: if isOwner(userId);
+      allow list: if false; // Prevent listing all users
+      allow create: if isOwner(userId) && request.resource.data.id == userId;
+      allow update: if isOwner(userId) && isExistingDoc() && request.resource.data.id == resource.data.id;
+      allow delete: if isOwner(userId) && isExistingDoc();
+    }
+
+    /**
+     * @description Controls access to user-specific notifications.
+     * @path /users/{userId}/notifications/{notificationId}
+     * @allow (update) A user marking their own notification as read.
+     * @deny (create) A user attempting to create a notification for themself (should be done by Cloud Functions).
+     * @deny (get) A user trying to read another user's notifications.
+     * @principle Enforces strict data ownership for private information.
+     */
+    match /users/{userId}/notifications/{notificationId} {
+      allow get, list: if isOwner(userId);
+      allow create: if false; // Notifications are created by backend functions, not clients.
+      allow update: if isOwner(userId) && isExistingDoc();
+      allow delete: if isOwner(userId) && isExistingDoc();
+    }
+
+    /**
+     * @description Controls access to project documents.
+     * @path /projects/{projectId}
+     * @allow (create) An authenticated user creating a new project and setting themselves as owner.
+     * @allow (get) A user who is a member of the project reading its details.
+     * @deny (delete) A project member (not owner) trying to delete the project.
+     * @deny (update) A user trying to change the owner of an existing project.
+     * @principle Implements shared access based on an explicit membership list.
+     */
+    match /projects/{projectId} {
+      allow get, list: if isSignedIn() && isProjectMember(projectId);
+      allow create: if isSignedIn() && request.resource.data.ownerId == request.auth.uid;
+      allow update: if isSignedIn() && isProjectMember(projectId) && isExistingDoc() && request.resource.data.ownerId == resource.data.ownerId;
+      allow delete: if isSignedIn() && isOwner(resource.data.ownerId) && isExistingDoc();
+    }
+
+    /**
+     * @description Controls access to tasks within a project.
+     * @path /projects/{projectId}/tasks/{taskId}
+     * @allow (get) A project member viewing a task.
+     * @allow (list) A project member listing all tasks in the project.
+     * @deny (create) A non-member trying to add a task to a project.
+     * @principle Access is inherited from the parent project's membership.
+     */
+    match /projects/{projectId}/tasks/{taskId} {
+      allow get, list: if isSignedIn() && isProjectMember(projectId);
+      allow create: if isSignedIn() && isProjectMember(projectId) && request.resource.data.projectId == projectId;
+      allow update: if isSignedIn() && isProjectMember(projectId) && isExistingDoc() && request.resource.data.projectId == resource.data.projectId;
+      allow delete: if isSignedIn() && isProjectMember(projectId) && isExistingDoc();
+    }
+
+    /**
+     * @description Controls access to subtasks within a task.
+     * @path /projects/{projectId}/tasks/{taskId}/subtasks/{subtaskId}
+     * @allow (create) A project member adding a subtask to a task.
+     * @deny (update) A non-member trying to check off a subtask.
+     * @principle Access is inherited from the parent project's membership.
+     */
+    match /projects/{projectId}/tasks/{taskId}/subtasks/{subtaskId} {
+      allow get, list: if isSignedIn() && isProjectMember(projectId);
+      allow create: if isSignedIn() && isProjectMember(projectId) && request.resource.data.taskId == taskId;
+      allow update: if isSignedIn() && isProjectMember(projectId) && isExistingDoc() && request.resource.data.taskId == resource.data.taskId;
+      allow delete: if isSignedIn() && isProjectMember(projectId) && isExistingDoc();
+    }
+
+    /**
+     * @description Controls access to attachments on a task.
+     * @path /projects/{projectId}/tasks/{taskId}/attachments/{attachmentId}
+     * @allow (create) A project member adding an attachment.
+     * @deny (delete) A non-member trying to delete an attachment.
+     * @principle Access is inherited from the parent project's membership.
+     */
+    match /projects/{projectId}/tasks/{taskId}/attachments/{attachmentId} {
+      allow get, list: if isSignedIn() && isProjectMember(projectId);
+      allow create: if isSignedIn() && isProjectMember(projectId) && request.resource.data.taskId == taskId;
+      allow update: if isSignedIn() && isProjectMember(projectId) && isExistingDoc() && request.resource.data.taskId == resource.data.taskId;
+      allow delete: if isSignedIn() && isProjectMember(projectId) && isExistingDoc();
+    }
+
+    /**
+     * @description Controls access to comments on a task.
+     * @path /projects/{projectId}/tasks/{taskId}/comments/{commentId}
+     * @allow (create) A project member adding a comment and setting themself as author.
+     * @allow (delete) A comment author deleting their own comment.
+     * @deny (update) A project member trying to edit another user's comment.
+     * @principle Access is inherited from the parent project, with writes restricted to the comment author.
+     */
+    match /projects/{projectId}/tasks/{taskId}/comments/{commentId} {
+      allow get, list: if isSignedIn() && isProjectMember(projectId);
+      allow create: if isSignedIn() && isProjectMember(projectId) && request.resource.data.authorId == request.auth.uid && request.resource.data.taskId == taskId;
+      allow update: if isSignedIn() && isOwner(resource.data.authorId) && isExistingDoc();
+      allow delete: if isSignedIn() && isOwner(resource.data.authorId) && isExistingDoc();
+    }
+
+    /**
+     * @description Controls access to global tags.
+     * @path /tags/{tagId}
+     * @allow (get) Any signed-in user can read tags.
+     * @allow (create) Any signed-in user can create new tags for the system.
+     * @deny (update) No user can update a tag, to prevent vandalism.
+     * @deny (delete) No user can delete a tag, to prevent breaking other tasks.
+     * @principle Provides public read and controlled create for global, non-owned data.
+     */
+    match /tags/{tagId} {
+      allow get, list: if isSignedIn();
+      allow create: if isSignedIn();
+      allow update: if false;
+      allow delete: if false;
+    }
+
+    /**
+     * @description Controls real-time presence data for tasks.
+     * @path /presence/{taskId}/{userId}
+     * @allow (create) A user setting their own presence on a task.
+     * @deny (get) Any user reading presence data. This is denied because the path structure does not allow securely checking if the reader has access to the task.
+     * @deny (update) A user trying to change another user's presence status.
+     * @principle Enforces document ownership for writes. Reads are disabled due to insecure data path.
+     */
+    match /presence/{taskId}/{userId} {
+      // CRITICAL: Reads are disallowed because there's no way to link {taskId} back to a project
+      // to check for membership. To enable reads, change path to /projects/{projectId}/tasks/{taskId}/presence/{userId}.
+      allow get, list: if false;
+      allow create: if isOwner(userId);
+      allow update: if isOwner(userId) && isExistingDoc();
+      allow delete: if isOwner(userId) && isExistingDoc();
+    }
+  }
+}
