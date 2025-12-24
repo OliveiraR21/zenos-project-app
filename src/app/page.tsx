@@ -29,11 +29,8 @@ export default function Home() {
     <div className="flex flex-col min-h-screen">
       <header className="container mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
         <Link href="/" className="flex items-center gap-2">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="text-primary">
-            <path d="M12 2L2 7V17L12 22L22 17V7L12 2Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-            <path d="M2 7L12 12L22 7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-            <path d="M12 22V12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-          </svg>
+          <Image src="/zenos_fundo_preto.png" alt="Zenos Logo" width={24} height={24} className="dark:block hidden" />
+          <Image src="/zenos_fundo_branco.png" alt="Zenos Logo" width={24} height={24} className="dark:hidden block" />
           <span className="font-display text-2xl tracking-wider text-foreground">Zenos</span>
         </Link>
         <nav className="flex items-center gap-4">

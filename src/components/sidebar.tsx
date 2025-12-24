@@ -17,6 +17,7 @@ import { projects } from "@/lib/placeholder-data"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { cn } from "@/lib/utils"
+import Image from "next/image"
 
 export function AppSidebar() {
   const pathname = usePathname();
@@ -26,11 +27,8 @@ export function AppSidebar() {
      <Sidebar collapsible="icon">
         <SidebarHeader>
           <div className="flex items-center gap-2 w-full p-2 justify-center">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="text-primary shrink-0">
-              <path d="M12 2L2 7V17L12 22L22 17V7L12 2Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-              <path d="M2 7L12 12L22 7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-              <path d="M12 22V12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-            </svg>
+            <Image src="/zenos_fundo_preto.png" alt="Zenos Logo" width={24} height={24} className="dark:block hidden" />
+            <Image src="/zenos_fundo_branco.png" alt="Zenos Logo" width={24} height={24} className="dark:hidden block" />
             <span className="font-display text-2xl tracking-wider text-foreground truncate">Zenos</span>
           </div>
         </SidebarHeader>
