@@ -29,9 +29,7 @@ export default function Home() {
     <div className="flex flex-col min-h-screen">
       <header className="container mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
         <Link href="/" className="flex items-center gap-2">
-          <Image src="/zenos_fundo_preto.png" alt="Zenos Logo" width={24} height={24} className="dark:block hidden" />
-          <Image src="/zenos_fundo_branco.png" alt="Zenos Logo" width={24} height={24} className="dark:hidden block" />
-          <span className="font-display text-2xl tracking-wider text-foreground">Zenos</span>
+          <span className="font-display text-2xl tracking-wider text-foreground">Projecj</span>
         </Link>
         <nav className="flex items-center gap-4">
           <Button variant="ghost" asChild>
@@ -44,6 +42,10 @@ export default function Home() {
       </header>
       <main className="flex-grow">
         <section className="container mx-auto px-4 sm:px-6 lg:px-8 py-20 md:py-32 text-center">
+          <div className="flex justify-center mb-8">
+            <Image src="/zenos_fundo_preto.png" alt="Zenos Logo" width={96} height={96} className="dark:block hidden" />
+            <Image src="/zenos_fundo_branco.png" alt="Zenos Logo" width={96} height={96} className="dark:hidden block" />
+          </div>
           <h1 className="text-5xl md:text-7xl font-display tracking-wider mb-6 text-foreground uppercase">
             Gerenciamento de Projetos, <span className="text-primary">Aperfeiçoado</span>.
           </h1>
