@@ -41,7 +41,7 @@ export default function Home() {
         </nav>
       </header>
       <main className="flex-grow">
-        <section className="container mx-auto px-4 sm:px-6 lg:px-8 pt-16 text-center">
+        <section className="container mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <div className="flex justify-center mb-8">
             <Image src="/zenos_sem_fundo_escuro.png" alt="Zenos Logo" width={96} height={96} className="dark:block hidden" />
             <Image src="/zenos_sem_fundo_claro.png" alt="Zenos Logo" width={96} height={96} className="dark:hidden block" />
