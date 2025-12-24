@@ -8,8 +8,7 @@ import {
     SheetTrigger,
   } from "@/components/ui/sheet"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { users } from "@/lib/placeholder-data";
-import type { Task, TaskStatus, TaskPriority } from "@/lib/types";
+import type { Task, TaskStatus, TaskPriority, User } from "@/lib/types";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import { Textarea } from "../ui/textarea";
@@ -19,10 +18,15 @@ import { Calendar } from "../ui/calendar";
 import { Badge } from "../ui/badge";
 import { Progress } from "../ui/progress";
 import { Checkbox } from "../ui/checkbox";
-import { CalendarIcon, Paperclip, Send, User, Users, Tag, ListChecks, Type } from "lucide-react";
+import { CalendarIcon, Paperclip, Send, User as UserIcon, ListChecks, Type } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Separator } from "../ui/separator";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
+import { useUser, useCollection, useFirestore } from "@/firebase";
+import { useTaskPresence } from "@/hooks/use-task-presence";
+import { collection, query, where } from "firebase/firestore";
+import { Tooltip, TooltipProvider, TooltipTrigger, TooltipContent } from "../ui/tooltip";
+
 
 interface TaskDetailsSheetProps {
     task: Task;
@@ -43,7 +47,18 @@ const priorityOptions: {value: TaskPriority, label: string}[] = [
 ];
 
 function TaskDetails({ task }: { task: Task }) {
-    const assignee = users.find((user) => user.id === task.assigneeId);
+    const { user: currentUser } = useUser();
+    const { viewingUsers, isPresent } = useTaskPresence(task.id, currentUser);
+    const firestore = useFirestore();
+
+    const usersQuery = useMemo(() => {
+        if (!firestore) return null;
+        return collection(firestore, "users");
+    }, [firestore]);
+    const { data: allUsers } = useCollection<User>(usersQuery);
+
+    const assignee = allUsers?.find((user) => user.id === task.assigneeId);
+
     const subtaskProgress = task.subtasks.length > 0 ? (task.subtasks.filter(st => st.isCompleted).length / task.subtasks.length) * 100 : 0;
     
     const [dueDate, setDueDate] = useState<Date | null>(null);
@@ -52,9 +67,6 @@ function TaskDetails({ task }: { task: Task }) {
         const date = task.dueDate ? new Date(task.dueDate) : undefined;
         setDueDate(date || null);
     }, [task.dueDate]);
-
-    // Simulate other users viewing this task
-    const viewingUsers = users.slice(2, 4);
 
     return (
         <>
@@ -76,13 +88,13 @@ function TaskDetails({ task }: { task: Task }) {
                 {/* Details Grid */}
                 <div className="grid grid-cols-2 gap-x-8 gap-y-4">
                     <div className="space-y-2">
-                        <h4 className="font-medium text-sm text-muted-foreground flex items-center"><User className="mr-2 size-4"/>Responsável</h4>
+                        <h4 className="font-medium text-sm text-muted-foreground flex items-center"><UserIcon className="mr-2 size-4"/>Responsável</h4>
                         <Select defaultValue={assignee?.id}>
                             <SelectTrigger>
                                 <SelectValue placeholder="Selecione o responsável" />
                             </SelectTrigger>
                             <SelectContent>
-                                {users.map(user => (
+                                {allUsers?.map(user => (
                                     <SelectItem key={user.id} value={user.id}>{user.name}</SelectItem>
                                 ))}
                             </SelectContent>
@@ -164,19 +176,28 @@ function TaskDetails({ task }: { task: Task }) {
                 <div className="grid gap-4">
                     <div className="flex items-center justify-between">
                         <h3 className="font-semibold">Atividade</h3>
-                        <div className="flex items-center -space-x-2">
-                            {viewingUsers.map(user => (
-                                <Avatar key={user.id} className="size-7 border-2 border-background">
-                                    <AvatarImage src={user.avatarUrl} alt={user.name}/>
-                                    <AvatarFallback>{user.name.charAt(0)}</AvatarFallback>
-                                </Avatar>
-                            ))}
-                        </div>
+                         <TooltipProvider>
+                            <div className="flex items-center -space-x-2">
+                                {viewingUsers.map(user => (
+                                    <Tooltip key={user.id}>
+                                        <TooltipTrigger asChild>
+                                            <Avatar className="size-8 border-2 border-background">
+                                                <AvatarImage src={user.avatarUrl} alt={user.name}/>
+                                                <AvatarFallback>{user.name.charAt(0)}</AvatarFallback>
+                                            </Avatar>
+                                        </TooltipTrigger>
+                                        <TooltipContent>
+                                            <p>{user.name} está visualizando</p>
+                                        </TooltipContent>
+                                    </Tooltip>
+                                ))}
+                            </div>
+                         </TooltipProvider>
                     </div>
                     <div className="flex gap-3">
                         <Avatar className="size-9">
-                            <AvatarImage src={users[0].avatarUrl} alt={users[0].name} />
-                            <AvatarFallback>{users[0].name.charAt(0)}</AvatarFallback>
+                           {currentUser && <AvatarImage src={currentUser.photoURL || undefined} alt={currentUser.displayName || ''} />}
+                           {currentUser && <AvatarFallback>{currentUser.displayName?.charAt(0)}</AvatarFallback>}
                         </Avatar>
                         <div className="w-full">
                             <Textarea placeholder="Escreva um comentário..." className="mb-2 bg-card"/>
@@ -187,7 +208,7 @@ function TaskDetails({ task }: { task: Task }) {
                     </div>
                     <div className="space-y-6">
                         {task.comments.map(comment => {
-                            const author = users.find(u => u.id === comment.authorId);
+                            const author = allUsers?.find(u => u.id === comment.authorId);
                             const [commentDate, setCommentDate] = useState('');
                             useEffect(() => {
                                 setCommentDate(new Date(comment.createdAt).toLocaleString('pt-BR'));
