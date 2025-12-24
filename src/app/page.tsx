@@ -29,7 +29,7 @@ export default function Home() {
     <div className="flex flex-col min-h-screen">
       <header className="container mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
         <Link href="/" className="flex items-center gap-2">
-          <span className="font-display text-2xl tracking-wider text-foreground">Projecj</span>
+          <span className="font-display text-2xl tracking-wider text-foreground">Project</span>
         </Link>
         <nav className="flex items-center gap-4">
           <Button variant="ghost" asChild>
