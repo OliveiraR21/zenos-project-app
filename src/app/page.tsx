@@ -43,8 +43,8 @@ export default function Home() {
       <main className="flex-grow">
         <section className="container mx-auto px-4 sm:px-6 lg:px-8 py-20 md:py-32 text-center">
           <div className="flex justify-center mb-8">
-            <Image src="/zenos_fundo_preto.png" alt="Zenos Logo" width={96} height={96} className="dark:block hidden" />
-            <Image src="/zenos_fundo_branco.png" alt="Zenos Logo" width={96} height={96} className="dark:hidden block" />
+            <Image src="/zenos_sem_fundo_escuro.png" alt="Zenos Logo" width={96} height={96} className="dark:block hidden" />
+            <Image src="/zenos_sem_fundo_claro.png" alt="Zenos Logo" width={96} height={96} className="dark:hidden block" />
           </div>
           <h1 className="text-5xl md:text-7xl font-display tracking-wider mb-6 text-foreground uppercase">
             Gerenciamento de Projetos, <span className="text-primary">Aperfeiçoado</span>.
