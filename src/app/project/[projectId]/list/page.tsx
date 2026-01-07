@@ -6,13 +6,13 @@ export const metadata: Metadata = {
 };
 
 export default function ProjectListPage({
-  params: { projectId },
+  params,
 }: {
   params: { projectId: string };
 }) {
   return (
     <div>
-      <TaskList projectId={projectId} />
+      <TaskList projectId={params.projectId} />
     </div>
   );
 }

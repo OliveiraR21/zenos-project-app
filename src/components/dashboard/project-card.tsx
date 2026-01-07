@@ -39,7 +39,7 @@ function MemberAvatar({ userId }: { userId: string }) {
   return (
     <Tooltip>
       <TooltipTrigger asChild>
-        <Avatar className="border-2 border-card">
+        <Avatar className="-ml-2 border-2 border-background bg-background">
           <AvatarImage src={user.avatarUrl} alt={user.name} />
           <AvatarFallback>{user.name.charAt(0)}</AvatarFallback>
         </Avatar>
@@ -52,15 +52,20 @@ function MemberAvatar({ userId }: { userId: string }) {
 }
 
 function ProjectMemberAvatars({ memberIds }: { memberIds: string[] }) {
-  // Limita a exibição a um número razoável de avatares para não sobrecarregar a UI
   const visibleMembers = memberIds.slice(0, 5);
+  const remainingMembers = memberIds.length - visibleMembers.length;
 
   return (
-    <TooltipProvider>
-      <div className="flex -space-x-2">
+    <TooltipProvider delayDuration={0}>
+      <div className="flex items-center">
         {visibleMembers.map((id) => (
           <MemberAvatar key={id} userId={id} />
         ))}
+        {remainingMembers > 0 && (
+           <Avatar className="-ml-2 border-2 border-background bg-background">
+             <AvatarFallback>+{remainingMembers}</AvatarFallback>
+           </Avatar>
+        )}
       </div>
     </TooltipProvider>
   );
@@ -87,7 +92,7 @@ export function ProjectCard({ project }: ProjectCardProps) {
       href={`/project/${project.id}/board`}
       className="block hover:no-underline"
     >
-      <Card className="flex flex-col hover:border-primary/50 hover:bg-card/80 transition-all h-full">
+      <Card className="flex flex-col hover:border-primary/50 hover:bg-card/80 transition-all h-full group">
         <CardHeader>
           <CardTitle className="text-lg group-hover:text-primary transition-colors">
             {project.name}
