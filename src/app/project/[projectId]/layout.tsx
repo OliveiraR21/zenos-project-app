@@ -2,18 +2,17 @@
 import { useDoc, useFirestore, useMemoFirebase } from '@/firebase';
 import { AppLayout } from '@/components/app-layout';
 import { doc } from 'firebase/firestore';
-import { notFound } from 'next/navigation';
+import { notFound, useParams } from 'next/navigation';
 import { ProjectTabs } from './project-tabs';
 import type { Project } from '@/lib/types';
 
 export default function ProjectLayout({
   children,
-  params,
 }: {
   children: React.ReactNode;
-  params: { projectId: string };
 }) {
-  const { projectId } = params;
+  const params = useParams();
+  const projectId = params.projectId as string;
   const firestore = useFirestore();
   const projectRef = useMemoFirebase(() => {
     if (!firestore || !projectId) return null;
