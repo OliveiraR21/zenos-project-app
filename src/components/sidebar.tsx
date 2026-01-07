@@ -13,9 +13,9 @@ import {
   useSidebar,
 } from '@/components/ui/sidebar';
 import { Bell, Home, Settings, SquareKanban } from 'lucide-react';
-import { useCollection, useFirestore, useMemoFirebase } from '@/firebase';
+import { useCollection, useFirestore, useMemoFirebase, useUser } from '@/firebase';
 import type { Project } from '@/lib/types';
-import { collection } from 'firebase/firestore';
+import { collection, query, where } from 'firebase/firestore';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
@@ -25,16 +25,34 @@ export function AppSidebar() {
   const pathname = usePathname();
   const { state } = useSidebar();
   const firestore = useFirestore();
+  const { user } = useUser();
 
   const projectsQuery = useMemoFirebase(
     () => {
-      if (!firestore) return null;
-      return collection(firestore, 'projects');
+      if (!firestore || !user) return null;
+      return query(
+        collection(firestore, 'projects'),
+        where('memberIds', 'array-contains', user.uid)
+      );
     },
-    [firestore]
+    [firestore, user]
   );
   
-  const { data: projects } = useCollection<Project>(projectsQuery);
+  const ownedProjectsQuery = useMemoFirebase(() => {
+    if (!firestore || !user) return null;
+    return query(
+      collection(firestore, 'projects'),
+      where('ownerId', '==', user.uid)
+    );
+  }, [firestore, user]);
+
+  const { data: memberProjects } = useCollection<Project>(projectsQuery);
+  const { data: ownedProjects } = useCollection<Project>(ownedProjectsQuery);
+
+  const projects = [
+    ...(ownedProjects || []),
+    ...(memberProjects || []),
+  ].filter((p, i, a) => a.findIndex(t => t.id === p.id) === i);
 
   return (
     <Sidebar collapsible="icon">
