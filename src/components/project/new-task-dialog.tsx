@@ -1,14 +1,14 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Plus, CalendarIcon } from 'lucide-react';
-import { collection, addDoc, serverTimestamp, Timestamp } from 'firebase/firestore';
-import { useFirestore, useCollection, useMemoFirebase } from '@/firebase';
+import { collection, addDoc, serverTimestamp, Timestamp, doc, where, query } from 'firebase/firestore';
+import { useFirestore, useCollection, useMemoFirebase, useDoc } from '@/firebase';
 import { useToast } from '@/hooks/use-toast';
-import type { User } from '@/lib/types';
+import type { User, Project } from '@/lib/types';
 import { cn } from '@/lib/utils';
 
 import {
@@ -60,11 +60,19 @@ export function NewTaskDialog({ projectId, children }: NewTaskDialogProps) {
   const firestore = useFirestore();
   const { toast } = useToast();
 
-  const usersQuery = useMemoFirebase(() => {
-     if (!firestore) return null;
-     return collection(firestore, 'users');
-  }, [firestore]);
-  const { data: users } = useCollection<User>(usersQuery);
+  const projectRef = useMemoFirebase(() => {
+    if (!firestore || !projectId) return null;
+    return doc(firestore, 'projects', projectId);
+  }, [firestore, projectId]);
+
+  const { data: project } = useDoc<Project>(projectRef);
+
+  const projectMembersQuery = useMemoFirebase(() => {
+    if (!firestore || !project?.memberIds || project.memberIds.length === 0) return null;
+    return query(collection(firestore, 'users'), where('id', 'in', project.memberIds));
+  }, [firestore, project]);
+
+  const { data: users } = useCollection<User>(projectMembersQuery);
 
   const form = useForm<z.infer<typeof taskSchema>>({
     resolver: zodResolver(taskSchema),
