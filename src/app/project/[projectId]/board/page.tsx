@@ -6,13 +6,13 @@ export const metadata: Metadata = {
 };
 
 export default function ProjectBoardPage({
-  params,
+  params: { projectId },
 }: {
   params: { projectId: string };
 }) {
   return (
     <div>
-      <KanbanBoard projectId={params.projectId} />
+      <KanbanBoard projectId={projectId} />
     </div>
   );
 }
