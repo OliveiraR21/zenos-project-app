@@ -5,7 +5,11 @@ export const metadata: Metadata = {
   title: "Quadro",
 };
 
-export default function ProjectBoardPage({ params }: { params: { projectId: string } }) {
+export default function ProjectBoardPage({
+  params,
+}: {
+  params: { projectId: string };
+}) {
   return (
     <div>
       <KanbanBoard projectId={params.projectId} />

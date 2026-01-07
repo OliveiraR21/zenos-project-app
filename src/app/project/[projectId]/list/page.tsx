@@ -5,7 +5,11 @@ export const metadata: Metadata = {
   title: "Lista",
 };
 
-export default function ProjectListPage({ params }: { params: { projectId: string } }) {
+export default function ProjectListPage({
+  params,
+}: {
+  params: { projectId: string };
+}) {
   return (
     <div>
       <TaskList projectId={params.projectId} />
