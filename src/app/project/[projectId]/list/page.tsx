@@ -5,11 +5,12 @@ export const metadata: Metadata = {
   title: "Lista",
 };
 
-export default function ProjectListPage({
-  params: { projectId },
+export default async function ProjectListPage({
+  params,
 }: {
-  params: { projectId: string };
+  params: Promise<{ projectId: string }>;
 }) {
+  const { projectId } = await params;
   return (
     <div>
       <TaskList projectId={projectId} />
