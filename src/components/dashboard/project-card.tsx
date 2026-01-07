@@ -9,7 +9,7 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { useCollection, useFirestore, useMemoFirebase } from '@/firebase';
+import { useDoc, useFirestore, useMemoFirebase } from '@/firebase';
 import type { Project, User } from '@/lib/types';
 import {
   Tooltip,
@@ -17,40 +17,69 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '@/components/ui/tooltip';
-import { collection, query, where } from 'firebase/firestore';
+import { doc } from 'firebase/firestore';
 import { useMemo } from 'react';
 
 interface ProjectCardProps {
   project: Project;
 }
 
+function MemberAvatar({ userId }: { userId: string }) {
+  const firestore = useFirestore();
+  const userRef = useMemoFirebase(
+    () => (firestore && userId ? doc(firestore, 'users', userId) : null),
+    [firestore, userId]
+  );
+  const { data: user } = useDoc<User>(userRef);
+
+  if (!user) {
+    return null; // ou um esqueleto/placeholder
+  }
+
+  return (
+    <Tooltip>
+      <TooltipTrigger asChild>
+        <Avatar className="border-2 border-card">
+          <AvatarImage src={user.avatarUrl} alt={user.name} />
+          <AvatarFallback>{user.name.charAt(0)}</AvatarFallback>
+        </Avatar>
+      </TooltipTrigger>
+      <TooltipContent>
+        <p>{user.name}</p>
+      </TooltipContent>
+    </Tooltip>
+  );
+}
+
+function ProjectMemberAvatars({ memberIds }: { memberIds: string[] }) {
+  // Limita a exibição a um número razoável de avatares para não sobrecarregar a UI
+  const visibleMembers = memberIds.slice(0, 5);
+
+  return (
+    <TooltipProvider>
+      <div className="flex -space-x-2">
+        {visibleMembers.map((id) => (
+          <MemberAvatar key={id} userId={id} />
+        ))}
+      </div>
+    </TooltipProvider>
+  );
+}
+
+
 export function ProjectCard({ project }: ProjectCardProps) {
   const firestore = useFirestore();
 
-  const userQueryIds = useMemo(() => {
-    const ids = [...(project.memberIds || [])];
-    if (project.ownerId) {
-      ids.push(project.ownerId);
-    }
-    // Firestore 'in' queries are limited to 30 elements.
-    if (ids.length === 0) return null;
-    return ids.slice(0, 30)
-  }, [project.memberIds, project.ownerId]);
+  const ownerRef = useMemoFirebase(
+    () => (firestore && project.ownerId ? doc(firestore, 'users', project.ownerId) : null),
+    [firestore, project.ownerId]
+  );
   
-  const usersQuery = useMemoFirebase(() => {
-    if (!firestore || !userQueryIds) return null;
-    return query(collection(firestore, 'users'), where('id', 'in', userQueryIds));
-  }, [firestore, userQueryIds?.join(',')]);
+  const { data: owner } = useDoc<User>(ownerRef);
 
-  const { data: users } = useCollection<User>(usersQuery);
-
-  const projectMembers = useMemo(() => {
-    return users?.filter((user) => project.memberIds?.includes(user.id)) || [];
-  }, [users, project.memberIds]);
-  
-  const owner = useMemo(() => {
-    return users?.find((user) => user.id === project.ownerId);
-  }, [users, project.ownerId]);
+  const memberIds = useMemo(() => {
+    return project.memberIds || [];
+  }, [project.memberIds]);
 
 
   return (
@@ -82,23 +111,7 @@ export function ProjectCard({ project }: ProjectCardProps) {
         <CardFooter>
           <div className="flex items-center justify-between w-full">
             <span className="text-sm text-muted-foreground">Membros</span>
-            <div className="flex -space-x-2">
-              <TooltipProvider>
-                {projectMembers.map((member) => (
-                  <Tooltip key={member.id}>
-                    <TooltipTrigger asChild>
-                      <Avatar className="border-2 border-card">
-                        <AvatarImage src={member.avatarUrl} alt={member.name} />
-                        <AvatarFallback>{member.name.charAt(0)}</AvatarFallback>
-                      </Avatar>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p>{member.name}</p>
-                    </TooltipContent>
-                  </Tooltip>
-                ))}
-              </TooltipProvider>
-            </div>
+            <ProjectMemberAvatars memberIds={memberIds} />
           </div>
         </CardFooter>
       </Card>

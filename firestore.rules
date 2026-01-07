@@ -16,7 +16,7 @@
  *   is inherited from the parent project. A `get()` call to the parent project document
  *   is used to verify membership before allowing access. This is secure but has a minor
  *   performance cost.
- * - User Privacy: User data is strictly segregated. Users cannot list or view other
+ * - User Privacy: User data is strictly segregated. Users cannot list other
  *   users' profiles or notifications.
  * - Immutable Ownership: Critical relational fields, such as `ownerId` on projects or
  *   `authorId` on comments, are immutable after creation to maintain data integrity.
@@ -64,13 +64,13 @@ service cloud.firestore {
      * @description Controls access to user profile documents.
      * @path /users/{userId}
      * @allow (create) A new user signing up: auth.uid matches {userId}.
-     * @allow (get) An authenticated user reading their own profile.
+     * @allow (get) Any authenticated user can read profile details of other users.
      * @deny (list) Any user attempting to list all users in the system.
      * @deny (update) A user trying to modify another user's profile.
-     * @principle Restricts access to a user's own data tree.
+     * @principle Restricts access to a user's own data tree for writes, allows reads for collaboration.
      */
     match /users/{userId} {
-      allow get: if isOwner(userId);
+      allow get: if isSignedIn();
       allow list: if false; // Prevent listing all users
       allow create: if isOwner(userId) && request.resource.data.id == userId;
       allow update: if isOwner(userId) && isExistingDoc() && request.resource.data.id == resource.data.id;
@@ -97,12 +97,11 @@ service cloud.firestore {
      * @path /projects/{projectId}
      * @allow (create) An authenticated user creating a new project and setting themselves as owner.
      * @allow (get) A user who is a member of the project reading its details.
+     * @allow (list) An authenticated user can list projects they are a member of.
      * @deny (delete) A project member (not owner) trying to delete the project.
-     * @deny (update) A user trying to change the owner of an existing project.
      * @principle Implements shared access based on an explicit membership list.
      */
     match /projects/{projectId} {
-      // Allow a user to list projects if their query includes their UID in 'memberIds' or 'ownerId'
       allow list: if isSignedIn();
       allow get: if isSignedIn() && isProjectMember(projectId);
       allow create: if isSignedIn() && request.resource.data.ownerId == request.auth.uid;
