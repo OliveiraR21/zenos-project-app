@@ -60,12 +60,32 @@
           "items": {
             "type": "string"
           }
+        },
+        "startDate": {
+            "type": "string",
+            "format": "date-time",
+            "description": "The start date of the project."
+        },
+        "endDate": {
+            "type": "string",
+            "format": "date-time",
+            "description": "The planned end date of the project."
+        },
+        "status": {
+            "type": "string",
+            "description": "The current status of the project (e.g., 'Not Started', 'In Progress', 'Completed', 'On Hold')."
+        },
+        "estimatedGains": {
+            "type": "number",
+            "description": "Estimated financial gains from the project."
         }
       },
       "required": [
         "id",
         "name",
-        "ownerId"
+        "ownerId",
+        "startDate",
+        "status"
       ]
     },
     "Task": {
@@ -483,3 +503,5 @@
     "reasoning": "This Firestore structure prioritizes authorization independence and efficient data access for the Zenos Project application. It leverages path-based ownership and membership maps to avoid complex `get()` calls in security rules.  The structure supports the core features of the application, including real-time presence and intelligent notifications, while adhering to the principles of clarity, predictability, and scalability.\n\n**Authorization Independence:** Authorization independence is achieved through denormalization. Project member information is denormalized into the `tasks` collection, enabling task-level authorization without needing to fetch project documents. This is crucial for atomic operations and simplifies security rules.  The presence of `memberIds` within Project documents and the denormalization into `tasks` enables listing projects a user is a member of, as well as tasks assigned or related to members of a project.\n\n**Structural Segregation:**  The structure segregates data with different security needs. User profiles are stored in a private collection (`/users/{userId}`), while project and task data are organized in separate collections to allow for more granular access control.\n\n**Access Modeling:**  Path-based ownership is used for user-specific data (e.g., `/users/{userId}/notifications/{notificationId}`). Membership maps are used for collaborative data, with `memberIds` in the `/projects/{projectId}` document.\n\n**QAPs Support:**\n\n*   **List Projects:** A user can list projects they own or are members of by querying the `/projects` collection and filtering based on the `ownerId` or `memberIds` array.\n*   **List Tasks:** A user can list tasks within a project by querying the `/projects/{projectId}/tasks` collection. Denormalization of `memberIds` into tasks enable simple rules to guarantee QAPs.\n*   **Secure Task Access:** Access to individual tasks is controlled by the `assigneeId` and project `memberIds`. Security rules can easily enforce that only the assignee or project members can read/write a task.\n\n**Real-time Presence:**  Presence data (who is viewing a task) is stored in a separate collection (`/presence/{taskId}/{userId}`), allowing for real-time updates without affecting the main task data.\n\n**Intelligent Notifications:** Notifications are stored in a user-specific collection (`/users/{userId}/notifications/{notificationId}`), ensuring that only the intended user can access their notifications.\n\n**Search:** Global search would ideally be handled by a dedicated search index (Algolia as suggested), but a simple implementation could be achieved using collection group queries and client-side filtering (though this is not scalable for large datasets)."
   }
 }
+
+    

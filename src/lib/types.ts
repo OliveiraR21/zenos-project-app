@@ -11,6 +11,10 @@ export interface Project {
   description: string;
   ownerId: string;
   memberIds: string[];
+  startDate: string;
+  endDate?: string;
+  status: 'Not Started' | 'In Progress' | 'Completed' | 'On Hold';
+  estimatedGains?: number;
 }
 
 export type TaskStatus = 'todo' | 'in-progress' | 'blocked' | 'done';
@@ -60,3 +64,5 @@ export interface Notification {
   createdAt: string;
   link: string;
 }
+
+    
