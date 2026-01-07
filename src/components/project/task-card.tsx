@@ -7,8 +7,8 @@ import {
     CardTitle,
   } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { users } from "@/lib/placeholder-data";
-import type { Task } from "@/lib/types";
+import { useDoc, useFirestore, useMemoFirebase } from "@/firebase";
+import type { Task, User } from "@/lib/types";
 import { cn } from "@/lib/utils";
 import { CalendarIcon, GripVertical, MessageSquare, Paperclip } from "lucide-react";
 import {
@@ -19,7 +19,8 @@ import {
   } from "@/components/ui/tooltip";
 import { TaskDetailsSheet } from "./task-details-sheet";
 import { Badge } from "../ui/badge";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { doc } from "firebase/firestore";
 
 interface TaskCardProps {
     task: Task;
@@ -32,7 +33,14 @@ const priorityClasses: Record<Task['priority'], string> = {
 };
 
 export function TaskCard({ task }: TaskCardProps) {
-    const assignee = users.find((user) => user.id === task.assigneeId);
+    const firestore = useFirestore();
+
+    const assigneeRef = useMemoFirebase(() => {
+        if (!firestore || !task.assigneeId) return null;
+        return doc(firestore, "users", task.assigneeId);
+    }, [firestore, task.assigneeId]);
+
+    const { data: assignee } = useDoc<User>(assigneeRef);
     
     const [dueDate, setDueDate] = useState<Date | null>(null);
     const [isOverdue, setIsOverdue] = useState(false);
@@ -55,19 +63,19 @@ export function TaskCard({ task }: TaskCardProps) {
                 </CardHeader>
                 <CardContent className="p-4 pt-0">
                     <div className="flex items-center gap-2 flex-wrap">
-                        {task.tags.map(tag => (
+                        {task.tags?.map(tag => (
                             <Badge key={tag} variant="secondary">{tag}</Badge>
                         ))}
                     </div>
                 </CardContent>
                 <CardFooter className="p-4 pt-0 flex justify-between items-center">
                     <div className="flex items-center gap-2">
-                        {task.comments.length > 0 && 
+                        {task.comments?.length > 0 && 
                             <span className="flex items-center gap-1 text-xs text-muted-foreground">
                                 <MessageSquare className="size-4" /> {task.comments.length}
                             </span>
                         }
-                        {task.attachments.length > 0 && 
+                        {task.attachments?.length > 0 && 
                             <span className="flex items-center gap-1 text-xs text-muted-foreground">
                                 <Paperclip className="size-4" /> {task.attachments.length}
                             </span>

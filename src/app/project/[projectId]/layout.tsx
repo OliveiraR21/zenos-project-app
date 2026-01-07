@@ -1,7 +1,11 @@
-import { AppLayout } from "@/components/app-layout";
-import { projects } from "@/lib/placeholder-data";
-import { notFound } from "next/navigation";
-import { ProjectTabs } from "./project-tabs";
+'use client';
+import { useDoc, useFirestore } from '@/firebase';
+import { AppLayout } from '@/components/app-layout';
+import { doc } from 'firebase/firestore';
+import { notFound } from 'next/navigation';
+import { ProjectTabs } from './project-tabs';
+import type { Project } from '@/lib/types';
+import { useMemo } from 'react';
 
 export default function ProjectLayout({
   children,
@@ -11,7 +15,17 @@ export default function ProjectLayout({
   params: { projectId: string };
 }) {
   const { projectId } = params;
-  const project = projects.find((p) => p.id === projectId);
+  const firestore = useFirestore();
+  const projectRef = useMemo(() => {
+    if (!firestore || !projectId) return null;
+    return doc(firestore, 'projects', projectId);
+  }, [firestore, projectId]);
+
+  const { data: project, isLoading } = useDoc<Project>(projectRef);
+
+  if (isLoading) {
+    return <AppLayout>Carregando...</AppLayout>;
+  }
 
   if (!project) {
     notFound();
@@ -26,9 +40,7 @@ export default function ProjectLayout({
 
   return (
     <AppLayout headerContent={headerContent}>
-      <ProjectTabs projectId={project.id}>
-        {children}
-      </ProjectTabs>
+      <ProjectTabs projectId={project.id}>{children}</ProjectTabs>
     </AppLayout>
   );
 }
