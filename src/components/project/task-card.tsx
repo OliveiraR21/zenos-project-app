@@ -19,7 +19,7 @@ import {
   } from "@/components/ui/tooltip";
 import { TaskDetailsSheet } from "./task-details-sheet";
 import { Badge } from "../ui/badge";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { doc } from "firebase/firestore";
 
 interface TaskCardProps {

@@ -15,7 +15,7 @@ import { ArrowUpDown } from 'lucide-react';
 import { Button } from '../ui/button';
 import { Checkbox } from '../ui/checkbox';
 import { TaskDetailsSheet } from './task-details-sheet';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { collection, doc } from 'firebase/firestore';
 
 interface TaskListProps {

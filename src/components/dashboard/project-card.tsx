@@ -33,13 +33,14 @@ export function ProjectCard({ project }: ProjectCardProps) {
       ids.push(project.ownerId);
     }
     // Firestore 'in' queries are limited to 30 elements.
-    return ids.length > 0 ? ids.slice(0, 30) : null;
+    if (ids.length === 0) return null;
+    return ids.slice(0, 30)
   }, [project.memberIds, project.ownerId]);
   
   const usersQuery = useMemoFirebase(() => {
     if (!firestore || !userQueryIds) return null;
     return query(collection(firestore, 'users'), where('id', 'in', userQueryIds));
-  }, [firestore, userQueryIds]);
+  }, [firestore, userQueryIds?.join(',')]);
 
   const { data: users } = useCollection<User>(usersQuery);
 

@@ -5,7 +5,6 @@ import type { Task, TaskStatus } from '@/lib/types';
 import { Button } from '../ui/button';
 import { Filter } from 'lucide-react';
 import { collection } from 'firebase/firestore';
-import { useMemo } from 'react';
 
 interface KanbanBoardProps {
   projectId: string;

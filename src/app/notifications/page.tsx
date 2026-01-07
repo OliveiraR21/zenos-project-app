@@ -1,12 +1,11 @@
 'use client';
-import { useMemo } from 'react';
 import { AppLayout } from '@/components/app-layout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Bell, MessageSquare, UserCheck } from 'lucide-react';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
 import type { Metadata } from 'next';
-import { useCollection, useFirestore, useUser } from '@/firebase';
+import { useCollection, useFirestore, useUser, useMemoFirebase } from '@/firebase';
 import { collection } from 'firebase/firestore';
 import type { Notification } from '@/lib/types';
 
@@ -18,7 +17,7 @@ export default function NotificationsPage() {
   const { user } = useUser();
   const firestore = useFirestore();
 
-  const notificationsQuery = useMemo(() => {
+  const notificationsQuery = useMemoFirebase(() => {
     if (!firestore || !user) return null;
     return collection(firestore, 'users', user.uid, 'notifications');
   }, [firestore, user]);

@@ -1,11 +1,10 @@
 'use client';
-import { useDoc, useFirestore } from '@/firebase';
+import { useDoc, useFirestore, useMemoFirebase } from '@/firebase';
 import { AppLayout } from '@/components/app-layout';
 import { doc } from 'firebase/firestore';
 import { notFound } from 'next/navigation';
 import { ProjectTabs } from './project-tabs';
 import type { Project } from '@/lib/types';
-import { useMemo } from 'react';
 
 export default function ProjectLayout({
   children,
@@ -16,7 +15,7 @@ export default function ProjectLayout({
 }) {
   const { projectId } = params;
   const firestore = useFirestore();
-  const projectRef = useMemo(() => {
+  const projectRef = useMemoFirebase(() => {
     if (!firestore || !projectId) return null;
     return doc(firestore, 'projects', projectId);
   }, [firestore, projectId]);

@@ -1,6 +1,6 @@
 'use client';
 
-import { useCollection, useFirestore } from '@/firebase';
+import { useCollection, useFirestore, useMemoFirebase } from '@/firebase';
 import { AppLayout } from '@/components/app-layout';
 import { ProjectCard } from '@/components/dashboard/project-card';
 import { NewProjectDialog } from '@/components/dashboard/new-project-dialog';
@@ -9,7 +9,6 @@ import { Plus } from 'lucide-react';
 import type { Metadata } from 'next';
 import { collection } from 'firebase/firestore';
 import type { Project } from '@/lib/types';
-import { useMemo } from 'react';
 
 // export const metadata: Metadata = {
 //   title: "Painel",
@@ -17,7 +16,7 @@ import { useMemo } from 'react';
 
 export default function DashboardPage() {
   const firestore = useFirestore();
-  const projectsQuery = useMemo(() => {
+  const projectsQuery = useMemoFirebase(() => {
     if (!firestore) return null;
     return collection(firestore, 'projects');
   }, [firestore]);
