@@ -51,18 +51,18 @@ export default function SignupPage() {
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="flex flex-col space-y-2">
-            <Button variant="outline">
+          <div className="flex justify-center space-x-2">
+            <Button variant="outline" size="icon">
               <GoogleIcon />
-              Cadastre-se com Google
+              <span className="sr-only">Cadastre-se com Google</span>
             </Button>
-            <Button variant="outline">
+            <Button variant="outline" size="icon">
               <MicrosoftIcon />
-              Cadastre-se com Microsoft
+              <span className="sr-only">Cadastre-se com Microsoft</span>
             </Button>
-            <Button variant="outline">
+            <Button variant="outline" size="icon">
               <AppleIcon />
-              Cadastre-se com Apple
+              <span className="sr-only">Cadastre-se com Apple</span>
             </Button>
           </div>
           <div className="relative">

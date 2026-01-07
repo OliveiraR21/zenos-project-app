@@ -52,18 +52,18 @@ export default function LoginPage() {
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="flex flex-col space-y-2">
-            <Button variant="outline">
+          <div className="flex justify-center space-x-2">
+            <Button variant="outline" size="icon">
               <GoogleIcon />
-              Entrar com Google
+              <span className="sr-only">Entrar com Google</span>
             </Button>
-            <Button variant="outline">
+            <Button variant="outline" size="icon">
               <MicrosoftIcon />
-              Entrar com Microsoft
+              <span className="sr-only">Entrar com Microsoft</span>
             </Button>
-            <Button variant="outline">
+            <Button variant="outline" size="icon">
               <AppleIcon />
-              Entrar com Apple
+              <span className="sr-only">Entrar com Apple</span>
             </Button>
           </div>
           <div className="relative">
