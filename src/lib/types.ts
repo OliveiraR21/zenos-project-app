@@ -27,13 +27,13 @@ export interface Task {
   status: TaskStatus;
   priority: TaskPriority;
   assigneeId?: string;
-  dueDate?: string;
-  tags: string[];
+  dueDate?: any;
+  tags?: string[];
   projectId: string;
-  subtasks: Subtask[];
-  attachments: Attachment[];
-  comments: Comment[];
-  createdAt: string;
+  subtasks?: Subtask[];
+  attachments?: Attachment[];
+  comments?: Comment[];
+  createdAt: any;
 }
 
 export interface Subtask {
@@ -54,15 +54,13 @@ export interface Comment {
   id: string;
   content: string;
   authorId: string;
-  createdAt: string;
+  createdAt: any;
 }
 
 export interface Notification {
   id: string;
   message: string;
   isRead: boolean;
-  createdAt: string;
-  link: string;
+  createdAt: any;
+  link?: string;
 }
-
-    

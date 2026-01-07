@@ -1,17 +1,13 @@
 'use client';
 import { AppLayout } from '@/components/app-layout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Bell, MessageSquare, UserCheck } from 'lucide-react';
+import { Bell, MessageSquare, UserCheck, CheckCircle } from 'lucide-react';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
-import type { Metadata } from 'next';
 import { useCollection, useFirestore, useUser, useMemoFirebase } from '@/firebase';
 import { collection } from 'firebase/firestore';
 import type { Notification } from '@/lib/types';
 
-// export const metadata: Metadata = {
-//   title: "Notificações",
-// };
 
 export default function NotificationsPage() {
   const { user } = useUser();
@@ -23,6 +19,14 @@ export default function NotificationsPage() {
   }, [firestore, user]);
 
   const { data: notifications, isLoading } = useCollection<Notification>(notificationsQuery);
+
+  const getIcon = (message: string) => {
+    if (message.includes('atribuiu')) return <UserCheck className="h-5 w-5 text-muted-foreground" />;
+    if (message.includes('comentário')) return <MessageSquare className="h-5 w-5 text-muted-foreground" />;
+    if (message.includes('vencimento')) return <Bell className="h-5 w-5 text-muted-foreground" />;
+    if (message.includes('concluiu')) return <CheckCircle className="h-5 w-5 text-muted-foreground" />;
+    return <Bell className="h-5 w-5 text-muted-foreground" />;
+  }
 
   return (
     <AppLayout>
@@ -41,7 +45,7 @@ export default function NotificationsPage() {
           {notifications && notifications.length > 0 && (
             <div className="flow-root">
               <ul role="list" className="-mb-8">
-                {notifications.map((notification, notificationIdx) => (
+                {notifications.sort((a, b) => b.createdAt.toDate() - a.createdAt.toDate()).map((notification, notificationIdx) => (
                   <li key={notification.id}>
                     <div className="relative pb-8">
                       {notificationIdx !== notifications.length - 1 ? (
@@ -60,18 +64,7 @@ export default function NotificationsPage() {
                             )}
                           >
                             <div className="h-8 w-8 bg-card rounded-full ring-8 ring-card flex items-center justify-center">
-                              {notification.message.includes('atribuiu') && (
-                                <UserCheck className="h-5 w-5 text-muted-foreground" />
-                              )}
-                              {notification.message.includes('comentário') && (
-                                <MessageSquare className="h-5 w-5 text-muted-foreground" />
-                              )}
-                              {notification.message.includes('vencimento') && (
-                                <Bell className="h-5 w-5 text-muted-foreground" />
-                              )}
-                              {notification.message.includes('concluiu') && (
-                                <UserCheck className="h-5 w-5 text-muted-foreground" />
-                              )}
+                              {getIcon(notification.message)}
                             </div>
                           </div>
                         </div>
@@ -85,9 +78,7 @@ export default function NotificationsPage() {
                             </Link>
                           </div>
                           <div className="mt-1 text-xs text-muted-foreground">
-                            {new Date(
-                              notification.createdAt
-                            ).toLocaleDateString()}
+                            {notification.createdAt.toDate().toLocaleString('pt-BR')}
                           </div>
                         </div>
                       </div>
