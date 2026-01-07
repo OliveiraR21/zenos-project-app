@@ -11,12 +11,13 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useCollection, useDoc, useFirestore, useMemoFirebase } from '@/firebase';
 import type { Task, User } from '@/lib/types';
 import { cn } from '@/lib/utils';
-import { ArrowUpDown } from 'lucide-react';
+import { ArrowUpDown, Plus } from 'lucide-react';
 import { Button } from '../ui/button';
 import { Checkbox } from '../ui/checkbox';
 import { TaskDetailsSheet } from './task-details-sheet';
 import { useEffect, useState, useMemo } from 'react';
 import { collection, doc } from 'firebase/firestore';
+import { NewTaskDialog } from './new-task-dialog';
 
 interface TaskListProps {
   projectId: string;
@@ -153,44 +154,54 @@ export function TaskList({ projectId }: TaskListProps) {
   }, [projectTasks, sortKey, sortDirection]);
 
   return (
-    <Table>
-      <TableHeader>
-        <TableRow>
-          <TableHead className="w-12">
-            <Checkbox />
-          </TableHead>
-          <TableHead>
-            <Button variant="ghost" onClick={() => handleSort('title')}>
-              Nome da Tarefa <ArrowUpDown className="ml-2 h-4 w-4" />
-            </Button>
-          </TableHead>
-          <TableHead>
-            <Button variant="ghost">
-              Responsável 
-            </Button>
-          </TableHead>
-          <TableHead>
-            <Button variant="ghost" onClick={() => handleSort('dueDate')}>
-              Data de Vencimento <ArrowUpDown className="ml-2 h-4 w-4" />
-            </Button>
-          </TableHead>
-          <TableHead>
-            <Button variant="ghost" onClick={() => handleSort('priority')}>
-              Prioridade <ArrowUpDown className="ml-2 h-4 w-4" />
-            </Button>
-          </TableHead>
-        </TableRow>
-      </TableHeader>
-      <TableBody>
-        {isLoading && (
+    <div>
+      <div className="flex justify-end mb-4">
+        <NewTaskDialog projectId={projectId}>
+           <Button>
+            <Plus className="mr-2 h-4 w-4" />
+            Nova Tarefa
+          </Button>
+        </NewTaskDialog>
+      </div>
+      <Table>
+        <TableHeader>
           <TableRow>
-            <TableCell colSpan={5}>Carregando tarefas...</TableCell>
+            <TableHead className="w-12">
+              <Checkbox />
+            </TableHead>
+            <TableHead>
+              <Button variant="ghost" onClick={() => handleSort('title')}>
+                Nome da Tarefa <ArrowUpDown className="ml-2 h-4 w-4" />
+              </Button>
+            </TableHead>
+            <TableHead>
+              <Button variant="ghost">
+                Responsável 
+              </Button>
+            </TableHead>
+            <TableHead>
+              <Button variant="ghost" onClick={() => handleSort('dueDate')}>
+                Data de Vencimento <ArrowUpDown className="ml-2 h-4 w-4" />
+              </Button>
+            </TableHead>
+            <TableHead>
+              <Button variant="ghost" onClick={() => handleSort('priority')}>
+                Prioridade <ArrowUpDown className="ml-2 h-4 w-4" />
+              </Button>
+            </TableHead>
           </TableRow>
-        )}
-        {sortedTasks.map((task) => (
-          <TaskRow key={task.id} task={task} />
-        ))}
-      </TableBody>
-    </Table>
+        </TableHeader>
+        <TableBody>
+          {isLoading && (
+            <TableRow>
+              <TableCell colSpan={5}>Carregando tarefas...</TableCell>
+            </TableRow>
+          )}
+          {sortedTasks.map((task) => (
+            <TaskRow key={task.id} task={task} />
+          ))}
+        </TableBody>
+      </Table>
+    </div>
   );
 }

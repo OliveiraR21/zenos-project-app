@@ -21,7 +21,8 @@ export default function ProjectLayout({
 
   const { data: project, isLoading } = useDoc<Project>(projectRef);
 
-  if (isLoading) {
+  // CORREÇÃO: Adicionada verificação (!firestore) para esperar a inicialização do Firebase
+  if (!firestore || isLoading) {
     return <AppLayout>Carregando...</AppLayout>;
   }
 

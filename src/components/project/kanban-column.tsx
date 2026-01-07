@@ -9,10 +9,12 @@ import { useAuth, useFirestore, addDocumentNonBlocking } from '@/firebase';
 import { collection, serverTimestamp } from 'firebase/firestore';
 import { useParams } from 'next/navigation';
 import { useToast } from '@/hooks/use-toast';
+import { NewTaskDialog } from './new-task-dialog';
 
 interface KanbanColumnProps {
   status: TaskStatus;
   tasks: Task[];
+  projectId: string;
 }
 
 const statusTitles: Record<TaskStatus, string> = {
@@ -29,12 +31,10 @@ const statusColors: Record<TaskStatus, string> = {
   done: 'bg-green-500',
 };
 
-export function KanbanColumn({ status, tasks }: KanbanColumnProps) {
+export function KanbanColumn({ status, tasks, projectId }: KanbanColumnProps) {
   const title = statusTitles[status];
   const { user } = useAuth();
   const firestore = useFirestore();
-  const params = useParams();
-  const projectId = params.projectId as string;
   const { toast } = useToast();
 
   const handleAddTask = async (event: React.FormEvent<HTMLFormElement>) => {
@@ -93,28 +93,12 @@ export function KanbanColumn({ status, tasks }: KanbanColumnProps) {
         ))}
       </div>
       <div className="mt-3">
-        <Card className="bg-transparent">
-          <CardContent className="p-2">
-            <form onSubmit={handleAddTask}>
-              <div className="flex items-center gap-2">
-                <Input
-                  name="title"
-                  placeholder="Adicionar uma nova tarefa..."
-                  className="bg-card/50 h-9"
-                  autoComplete="off"
-                />
-                <Button
-                  type="submit"
-                  size="icon"
-                  variant="ghost"
-                  className="shrink-0 h-9 w-9"
-                >
-                  <Plus className="h-4 w-4" />
-                </Button>
-              </div>
-            </form>
-          </CardContent>
-        </Card>
+        <NewTaskDialog projectId={projectId}>
+           <Button variant="ghost" className="w-full justify-start">
+              <Plus className="mr-2 h-4 w-4" />
+              Adicionar tarefa
+            </Button>
+        </NewTaskDialog>
       </div>
     </div>
   );
