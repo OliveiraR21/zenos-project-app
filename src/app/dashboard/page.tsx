@@ -6,19 +6,21 @@ import { ProjectCard } from '@/components/dashboard/project-card';
 import { NewProjectDialog } from '@/components/dashboard/new-project-dialog';
 import { Button } from '@/components/ui/button';
 import { Plus } from 'lucide-react';
-import type { Metadata } from 'next';
 import { collection, query, where } from 'firebase/firestore';
 import type { Project } from '@/lib/types';
 import { useRouter } from 'next/navigation';
-
-// export const metadata: Metadata = {
-//   title: "Painel",
-// };
+import { useEffect } from 'react';
 
 export default function DashboardPage() {
   const { user, isUserLoading } = useUser();
   const firestore = useFirestore();
   const router = useRouter();
+
+  useEffect(() => {
+    if (!isUserLoading && !user) {
+      router.push('/login');
+    }
+  }, [user, isUserLoading, router]);
 
   const projectsQuery = useMemoFirebase(() => {
     if (!firestore || !user) return null;
@@ -44,12 +46,11 @@ export default function DashboardPage() {
   if (isUserLoading || memberLoading || ownerLoading) {
     return <AppLayout>Carregando projetos...</AppLayout>;
   }
-
-  if (!user && !isUserLoading) {
-    router.push('/login');
+  
+  if (!user) {
     return null;
   }
-  
+
   const projects = [
     ...(ownedProjects || []),
     ...(memberProjects || []),
