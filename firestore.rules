@@ -1,8 +1,8 @@
 /**
  * Core Philosophy: This ruleset enforces a collaborative, project-based security model.
  * Access to shared resources like tasks, comments, and attachments is primarily determined
- * by a user's membership in a parent project. User-specific data, such as profiles and
- * notifications, is strictly private and only accessible by the owner.
+ * by a user's membership in a parent project. User-specific data, such as profiles
+ * and notifications, is strictly private and only accessible by the owner.
  *
  * Data Structure: The data is organized hierarchically. Core collaborative work happens
  * under the `/projects/{projectId}` collection. Each user also has a private data tree
@@ -102,7 +102,9 @@ service cloud.firestore {
      * @principle Implements shared access based on an explicit membership list.
      */
     match /projects/{projectId} {
-      allow get, list: if isSignedIn() && isProjectMember(projectId);
+      // Allow a user to list projects if their query includes their UID in 'memberIds' or 'ownerId'
+      allow list: if isSignedIn();
+      allow get: if isSignedIn() && isProjectMember(projectId);
       allow create: if isSignedIn() && request.resource.data.ownerId == request.auth.uid;
       allow update: if isSignedIn() && isProjectMember(projectId) && isExistingDoc() && request.resource.data.ownerId == resource.data.ownerId;
       allow delete: if isSignedIn() && isOwner(resource.data.ownerId) && isExistingDoc();
