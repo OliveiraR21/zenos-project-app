@@ -43,22 +43,32 @@ export function useDoc<T = any>(
   type StateDataType = WithId<T> | null;
 
   const [data, setData] = useState<StateDataType>(null);
-  // CORREÇÃO: Começa como true para evitar renderização prematura de "não encontrado"
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<FirestoreError | Error | null>(null);
 
   useEffect(() => {
-    if (!memoizedDocRef) {
+    // If the reference is explicitly undefined, it means we are still waiting for dependencies.
+    // We should be in a loading state and not do anything else.
+    if (memoizedDocRef === undefined) {
+      setIsLoading(true);
       setData(null);
-      setIsLoading(false); // Define como false se não houver ref
       setError(null);
       return;
     }
 
+    // If the reference is explicitly null, it means the dependency is resolved, but it's empty.
+    // This is a final state, so we are not loading and there's no data.
+    if (memoizedDocRef === null) {
+      setIsLoading(false);
+      setData(null);
+      setError(null);
+      return;
+    }
+
+    // If we have a valid reference, start the subscription.
     setIsLoading(true);
     setError(null);
-    // Optional: setData(null); // Clear previous data instantly
-
+    
     const unsubscribe = onSnapshot(
       memoizedDocRef,
       (snapshot: DocumentSnapshot<DocumentData>) => {

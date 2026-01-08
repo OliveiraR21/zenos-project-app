@@ -63,7 +63,7 @@ function ProjectMemberAvatars({ memberIds }: { memberIds: string[] }) {
   }
 
   const visibleMembers = members.slice(0, 5);
-  const remainingMembersCount = members.length > visibleMembers.length ? memberIds.length - visibleMembers.length : 0;
+  const remainingMembersCount = members.length > 5 ? members.length - 5 : 0;
 
 
   return (
@@ -91,7 +91,7 @@ export function ProjectCard({ project }: ProjectCardProps) {
     [firestore, project.ownerId]
   );
   
-  const { data: owner } = useDoc<User>(ownerRef);
+  const { data: owner, isLoading: isOwnerLoading } = useDoc<User>(ownerRef);
 
   const memberIds = useMemo(() => {
     return project.memberIds || [];
@@ -113,16 +113,24 @@ export function ProjectCard({ project }: ProjectCardProps) {
           </CardDescription>
         </CardHeader>
         <CardContent className="flex-grow">
-          {owner && (
-            <div className="text-sm text-muted-foreground flex items-center gap-2">
-              <span className="font-medium">Dono:</span>
-              <Avatar className="size-6">
-                <AvatarImage src={owner.photoURL} alt={owner.displayName} />
-                <AvatarFallback>{owner.displayName?.charAt(0)}</AvatarFallback>
-              </Avatar>
-              <span>{owner.displayName}</span>
-            </div>
-          )}
+          <div className="text-sm text-muted-foreground flex items-center gap-2">
+            <span className="font-medium">Dono:</span>
+            {!isOwnerLoading && owner && (
+              <>
+                <Avatar className="size-6">
+                  <AvatarImage src={owner.photoURL} alt={owner.displayName} />
+                  <AvatarFallback>{owner.displayName?.charAt(0)}</AvatarFallback>
+                </Avatar>
+                <span>{owner.displayName}</span>
+              </>
+            )}
+            {isOwnerLoading && (
+                <div className='flex items-center gap-2'>
+                    <div className="size-6 rounded-full bg-muted animate-pulse" />
+                    <div className="h-4 w-24 bg-muted rounded animate-pulse" />
+                </div>
+            )}
+          </div>
         </CardContent>
         <CardFooter>
           <div className="flex items-center justify-between w-full">
