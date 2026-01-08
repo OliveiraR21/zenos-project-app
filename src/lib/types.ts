@@ -33,7 +33,8 @@ export interface Task {
   projectId: string;
   subtasks?: Subtask[];
   attachments?: Attachment[];
-  comments?: Comment[];
+  // Comments are now a subcollection
+  // comments?: Comment[]; 
   createdAt: any;
 }
 

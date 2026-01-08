@@ -3,11 +3,8 @@ import type { Task, TaskStatus } from '@/lib/types';
 import { TaskCard } from './task-card';
 import { Plus } from 'lucide-react';
 import { Button } from '../ui/button';
-import { Card, CardContent } from '../ui/card';
-import { Input } from '../ui/input';
 import { useAuth, useFirestore, addDocumentNonBlocking } from '@/firebase';
 import { collection, serverTimestamp } from 'firebase/firestore';
-import { useParams } from 'next/navigation';
 import { useToast } from '@/hooks/use-toast';
 import { NewTaskDialog } from './new-task-dialog';
 
@@ -32,7 +29,6 @@ const statusColors: Record<TaskStatus, string> = {
 };
 
 export function KanbanColumn({ status, tasks, projectId }: KanbanColumnProps) {
-  const title = statusTitles[status];
   const { user } = useAuth();
   const firestore = useFirestore();
   const { toast } = useToast();
@@ -61,7 +57,7 @@ export function KanbanColumn({ status, tasks, projectId }: KanbanColumnProps) {
         'tasks'
       );
       addDocumentNonBlocking(tasksCollection, {
-        title: taskTitle,
+        name: taskTitle,
         status: status,
         priority: 'medium', // Default priority
         createdAt: serverTimestamp(),
@@ -93,7 +89,7 @@ export function KanbanColumn({ status, tasks, projectId }: KanbanColumnProps) {
         ))}
       </div>
       <div className="mt-3">
-        <NewTaskDialog projectId={projectId}>
+        <NewTaskDialog projectId={projectId} status={status}>
            <Button variant="ghost" className="w-full justify-start">
               <Plus className="mr-2 h-4 w-4" />
               Adicionar tarefa

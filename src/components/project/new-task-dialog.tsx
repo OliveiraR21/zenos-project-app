@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -8,7 +8,7 @@ import { Plus, CalendarIcon } from 'lucide-react';
 import { collection, addDoc, serverTimestamp, Timestamp, doc, where, query, documentId } from 'firebase/firestore';
 import { useFirestore, useCollection, useMemoFirebase, useDoc } from '@/firebase';
 import { useToast } from '@/hooks/use-toast';
-import type { User, Project } from '@/lib/types';
+import type { User, Project, TaskStatus } from '@/lib/types';
 import { cn } from '@/lib/utils';
 
 import {
@@ -52,10 +52,11 @@ const taskSchema = z.object({
 
 interface NewTaskDialogProps {
   projectId: string;
+  status?: TaskStatus;
   children?: React.ReactNode;
 }
 
-export function NewTaskDialog({ projectId, children }: NewTaskDialogProps) {
+export function NewTaskDialog({ projectId, status = 'todo', children }: NewTaskDialogProps) {
   const [isOpen, setIsOpen] = useState(false);
   const firestore = useFirestore();
   const { toast } = useToast();
@@ -72,7 +73,7 @@ export function NewTaskDialog({ projectId, children }: NewTaskDialogProps) {
     return query(collection(firestore, 'users'), where(documentId(), 'in', project.memberIds));
   }, [firestore, project]);
 
-  const { data: users } = useCollection<User>(projectMembersQuery);
+  const { data: users, isLoading: areUsersLoading } = useCollection<User>(projectMembersQuery);
 
   const form = useForm<z.infer<typeof taskSchema>>({
     resolver: zodResolver(taskSchema),
@@ -90,7 +91,7 @@ export function NewTaskDialog({ projectId, children }: NewTaskDialogProps) {
       await addDoc(collection(firestore, 'projects', projectId, 'tasks'), {
         ...values,
         projectId,
-        status: 'todo',
+        status, // Use the status from props, default to 'todo'
         dueDate: values.dueDate ? Timestamp.fromDate(values.dueDate) : null,
         createdAt: serverTimestamp(),
         subtasks: [],
@@ -233,7 +234,7 @@ export function NewTaskDialog({ projectId, children }: NewTaskDialogProps) {
                   <Select onValueChange={field.onChange} defaultValue={field.value}>
                     <FormControl>
                       <SelectTrigger>
-                        <SelectValue placeholder="Selecione um membro" />
+                        <SelectValue placeholder={areUsersLoading ? "Carregando..." : "Selecione um membro"} />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>

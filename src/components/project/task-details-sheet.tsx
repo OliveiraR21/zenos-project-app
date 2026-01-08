@@ -40,7 +40,7 @@ import { Separator } from '../ui/separator';
 import { useEffect, useState, useMemo } from 'react';
 import { useUser, useCollection, useFirestore, useMemoFirebase, updateDocumentNonBlocking, useDoc } from '@/firebase';
 import { useTaskPresence } from '@/hooks/use-task-presence';
-import { collection, doc, serverTimestamp, Timestamp, query, where, documentId } from 'firebase/firestore';
+import { collection, doc, serverTimestamp, Timestamp, query, where, documentId, arrayUnion, arrayRemove } from 'firebase/firestore';
 import {
   Tooltip,
   TooltipProvider,
@@ -68,47 +68,60 @@ const priorityOptions: { value: TaskPriority; label: string }[] = [
   { value: 'high', label: 'Alta' },
 ];
 
-function TaskDetails({ task }: { task: Task }) {
+function TaskDetails({ task: initialTask }: { task: Task }) {
   const { user: currentUser } = useUser();
   const firestore = useFirestore();
   const { toast } = useToast();
 
+  // Use a real-time listener for the task itself
+  const taskRef = useMemoFirebase(() => {
+    if (!firestore || !initialTask.projectId || !initialTask.id) return null;
+    return doc(firestore, 'projects', initialTask.projectId, 'tasks', initialTask.id);
+  }, [firestore, initialTask.projectId, initialTask.id]);
+
+  const { data: task, isLoading: isTaskLoading } = useDoc<Task>(taskRef);
+
+
   const { viewingUsers } = useTaskPresence(
-    task.id,
+    initialTask.id,
     currentUser
   );
 
-  const [localTask, setLocalTask] = useState<Task>(task);
   const [newComment, setNewComment] = useState("");
-  const [newSubtask, setNewSubtask] = useState("");
+  const [newSubtaskTitle, setNewSubtaskTitle] = useState("");
 
   const projectRef = useMemoFirebase(() => {
-    if (!firestore || !task.projectId) return null;
+    if (!firestore || !task?.projectId) return null;
     return doc(firestore, 'projects', task.projectId);
-  }, [firestore, task.projectId]);
+  }, [firestore, task?.projectId]);
   const { data: project } = useDoc<Project>(projectRef);
 
   const membersQuery = useMemoFirebase(() => {
     if (!firestore || !project?.memberIds || project.memberIds.length === 0) return null;
     return query(collection(firestore, 'users'), where(documentId(), 'in', project.memberIds));
   }, [firestore, project]);
-  const { data: projectMembers } = useCollection<User>(membersQuery);
+  const { data: projectMembers, isLoading: areMembersLoading } = useCollection<User>(membersQuery);
 
-  const allUsers = useMemo(() => {
-    if(!viewingUsers || !projectMembers) return [];
-    const all = [...viewingUsers, ...(projectMembers || [])];
-    return all.filter((u, i, a) => a.findIndex(t => t.id === u.id) === i);
-  }, [viewingUsers, projectMembers])
+  const commentsQuery = useMemoFirebase(() => {
+     if (!firestore || !task?.id) return null;
+     return collection(firestore, 'projects', task.projectId, 'tasks', task.id, 'comments');
+  }, [firestore, task?.id, task?.projectId]);
+  const {data: comments} = useCollection<Comment>(commentsQuery);
+
+  // Combine members and viewers into a single list of users for lookups
+  const allUsersMap = useMemo(() => {
+    const userMap = new Map<string, User>();
+    const addUser = (user: User) => user && user.id && !userMap.has(user.id) && userMap.set(user.id, user);
+
+    viewingUsers.forEach(addUser);
+    projectMembers?.forEach(addUser);
+    
+    return userMap;
+  }, [viewingUsers, projectMembers]);
 
 
-  useEffect(() => {
-    setLocalTask(task);
-  }, [task]);
+  const subtasks = task?.subtasks || [];
   
-  const assignee = allUsers?.find((user) => user.id === localTask.assigneeId);
-  const subtasks = localTask.subtasks || [];
-  const comments = localTask.comments || [];
-
   const subtaskProgress =
     subtasks.length > 0
       ? (subtasks.filter((st) => st.isCompleted).length /
@@ -116,24 +129,16 @@ function TaskDetails({ task }: { task: Task }) {
         100
       : 0;
 
-  const [dueDate, setDueDate] = useState<Date | null>(null);
-
-  useEffect(() => {
-    if (localTask.dueDate && localTask.dueDate.toDate) {
-      const date = localTask.dueDate.toDate();
-      setDueDate(date);
-    } else if (localTask.dueDate) {
-      const date = new Date(localTask.dueDate);
-      setDueDate(date);
-    } else {
-      setDueDate(null);
+  const dueDate = useMemo(() => {
+    if (task?.dueDate && task.dueDate.toDate) {
+      return task.dueDate.toDate();
     }
-  }, [localTask.dueDate]);
+    return null;
+  }, [task?.dueDate]);
 
 
   const updateTask = (field: keyof Task, value: any) => {
-    if (!firestore || !localTask.projectId || !localTask.id) return;
-    const taskRef = doc(firestore, 'projects', localTask.projectId, 'tasks', localTask.id);
+    if (!taskRef) return;
     let updateValue = value;
     if (field === 'dueDate' && value instanceof Date) {
         updateValue = Timestamp.fromDate(value);
@@ -142,39 +147,48 @@ function TaskDetails({ task }: { task: Task }) {
   };
   
   const handleAddComment = () => {
-    if (!currentUser || !newComment.trim() || !localTask.projectId) return;
-
-    const newCommentObj: Comment = {
-      id: doc(collection(firestore, 'dummy')).id, // temporary client-side id
-      authorId: currentUser.uid,
+    if (!currentUser || !newComment.trim() || !commentsQuery) return;
+    
+    addDoc(commentsQuery, {
       content: newComment,
+      authorId: currentUser.uid,
       createdAt: serverTimestamp(),
-    };
+    });
 
-    const updatedComments = [...(localTask.comments || []), newCommentObj];
-    updateTask('comments', updatedComments);
     setNewComment("");
   };
 
   const handleSubtaskChange = (subtaskId: string, isCompleted: boolean) => {
-      const updatedSubtasks = (localTask.subtasks || []).map(st => 
+      const updatedSubtasks = (task?.subtasks || []).map(st => 
         st.id === subtaskId ? { ...st, isCompleted } : st
       );
       updateTask('subtasks', updatedSubtasks);
   }
 
   const handleAddSubtask = () => {
-      if (!newSubtask.trim()) return;
+      if (!newSubtaskTitle.trim() || !task) return;
       const newSubtaskObj: Subtask = {
-          id: doc(collection(firestore, 'dummy')).id,
-          title: newSubtask,
+          id: doc(collection(firestore, 'dummy')).id, // temporary client-side id
+          title: newSubtaskTitle,
           isCompleted: false,
       };
-      const updatedSubtasks = [...(localTask.subtasks || []), newSubtaskObj];
-      updateTask('subtasks', updatedSubtasks);
-      setNewSubtask("");
+      // Use arrayUnion to add a new subtask
+      updateDocumentNonBlocking(taskRef, { subtasks: arrayUnion(newSubtaskObj) });
+      setNewSubtaskTitle("");
   }
+  
+  const handleDeleteSubtask = (subtaskToDelete: Subtask) => {
+    if (!taskRef) return;
+    // Use arrayRemove to delete a subtask
+    updateDocumentNonBlocking(taskRef, { subtasks: arrayRemove(subtaskToDelete) });
+  };
 
+
+  if (isTaskLoading || !task) {
+    return <div>Carregando tarefa...</div>
+  }
+  
+  const assignee = allUsersMap.get(task.assigneeId || '');
 
   return (
     <>
@@ -182,17 +196,17 @@ function TaskDetails({ task }: { task: Task }) {
         <SheetTitle asChild>
           <Input
             className="text-2xl font-semibold tracking-tight border-0 shadow-none focus-visible:ring-0 px-0 h-auto"
-            defaultValue={localTask.title}
+            defaultValue={task.title}
             onBlur={(e) => updateTask('title', e.target.value)}
           />
         </SheetTitle>
         <SheetDescription>
           No projeto{' '}
           <Link
-            href={`/project/${localTask.projectId}/board`}
+            href={`/project/${task.projectId}/board`}
             className="font-medium text-primary hover:underline"
           >
-            {project?.name || localTask.projectId}
+            {project?.name || task.projectId}
           </Link>
         </SheetDescription>
       </SheetHeader>
@@ -203,7 +217,7 @@ function TaskDetails({ task }: { task: Task }) {
             <Type className="mr-2 size-4" /> Descrição
           </h3>
           <Textarea
-            defaultValue={localTask.description}
+            defaultValue={task.description}
             rows={4}
             className="bg-card/50"
             placeholder='Adicione uma descrição mais detalhada...'
@@ -220,7 +234,7 @@ function TaskDetails({ task }: { task: Task }) {
             </h4>
             <Select defaultValue={assignee?.id} onValueChange={(val) => updateTask('assigneeId', val)}>
               <SelectTrigger>
-                <SelectValue placeholder="Selecione o responsável" />
+                 <SelectValue placeholder={areMembersLoading ? "Carregando..." : "Selecione"} />
               </SelectTrigger>
               <SelectContent>
                 {projectMembers?.map((user) => (
@@ -260,10 +274,7 @@ function TaskDetails({ task }: { task: Task }) {
                 <Calendar
                   mode="single"
                   selected={dueDate ?? undefined}
-                  onSelect={(day) => {
-                    setDueDate(day || null);
-                    updateTask('dueDate', day || null);
-                  }}
+                  onSelect={(day) => updateTask('dueDate', day || null)}
                 />
               </PopoverContent>
             </Popover>
@@ -272,7 +283,7 @@ function TaskDetails({ task }: { task: Task }) {
             <h4 className="font-medium text-sm text-muted-foreground">
               Status
             </h4>
-            <Select defaultValue={localTask.status} onValueChange={(val: TaskStatus) => updateTask('status', val)}>
+            <Select defaultValue={task.status} onValueChange={(val: TaskStatus) => updateTask('status', val)}>
               <SelectTrigger>
                 <SelectValue placeholder="Definir status" />
               </SelectTrigger>
@@ -289,7 +300,7 @@ function TaskDetails({ task }: { task: Task }) {
             <h4 className="font-medium text-sm text-muted-foreground">
               Prioridade
             </h4>
-            <Select defaultValue={localTask.priority} onValueChange={(val: TaskPriority) => updateTask('priority', val)}>
+            <Select defaultValue={task.priority} onValueChange={(val: TaskPriority) => updateTask('priority', val)}>
               <SelectTrigger>
                 <SelectValue placeholder="Definir prioridade" />
               </SelectTrigger>
@@ -310,7 +321,7 @@ function TaskDetails({ task }: { task: Task }) {
             <Tag className="mr-2 size-4" /> Tags
           </h3>
           <div className="flex flex-wrap gap-2">
-            {localTask.tags?.map((tag) => (
+            {task.tags?.map((tag) => (
               <Badge key={tag} variant="secondary">
                 {tag}
               </Badge>
@@ -347,22 +358,21 @@ function TaskDetails({ task }: { task: Task }) {
                     subtask.isCompleted && 'line-through text-muted-foreground'
                   )}
                 />
-                 <Button variant="ghost" size="icon" className="size-6 opacity-0 group-hover:opacity-100 transition-opacity">
+                 <Button variant="ghost" size="icon" className="size-6 opacity-0 group-hover:opacity-100 transition-opacity" onClick={() => handleDeleteSubtask(subtask)}>
                     <X className="size-4" />
                 </Button>
               </div>
             ))}
           </div>
-          <div className="flex items-center gap-2">
+          <form onSubmit={(e) => { e.preventDefault(); handleAddSubtask(); }} className="flex items-center gap-2">
             <Input 
                 placeholder="Adicionar subtarefa e pressionar Enter" 
                 className="bg-card/50"
-                value={newSubtask}
-                onChange={(e) => setNewSubtask(e.target.value)}
-                onKeyDown={(e) => e.key === 'Enter' && handleAddSubtask()}
+                value={newSubtaskTitle}
+                onChange={(e) => setNewSubtaskTitle(e.target.value)}
             />
-            <Button onClick={handleAddSubtask}><Plus className='mr-2 size-4'/> Adicionar</Button>
-          </div>
+            <Button type="submit"><Plus className='mr-2 size-4'/> Adicionar</Button>
+          </form>
         </div>
 
         {/* Attachments */}
@@ -429,16 +439,9 @@ function TaskDetails({ task }: { task: Task }) {
             </div>
           </div>
           <div className="space-y-6">
-            {comments.slice().reverse().map((comment) => {
-              const author = allUsers?.find((u) => u.id === comment.authorId);
-              const [commentDate, setCommentDate] = useState('');
-              useEffect(() => {
-                if (comment.createdAt && comment.createdAt.toDate) {
-                    setCommentDate(comment.createdAt.toDate().toLocaleString('pt-BR'));
-                } else if (comment.createdAt) {
-                    setCommentDate(new Date(comment.createdAt).toLocaleString('pt-BR'))
-                }
-              }, [comment.createdAt]);
+            {comments?.slice().reverse().map((comment) => {
+              const author = allUsersMap.get(comment.authorId);
+              const commentDate = comment.createdAt?.toDate()?.toLocaleString('pt-BR') || 'agora';
 
               return (
                 <div key={comment.id} className="flex gap-3">
@@ -482,7 +485,7 @@ export function TaskDetailsSheet({ task, children }: TaskDetailsSheetProps) {
         {children}
       </SheetTrigger>
       <SheetContent className="w-full sm:max-w-2xl overflow-y-auto">
-        <TaskDetails task={task} />
+        {isOpen && <TaskDetails task={task} />}
       </SheetContent>
     </Sheet>
   );
