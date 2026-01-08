@@ -9,6 +9,9 @@ import {
   deleteDoc,
   setDoc,
   serverTimestamp,
+  query,
+  where,
+  documentId,
 } from "firebase/firestore";
 import type { User } from "firebase/auth";
 import type { User as AppUser } from "@/lib/types";
@@ -32,23 +35,14 @@ export function useTaskPresence(taskId: string, currentUser: User | null) {
   }, [firestore, taskId]);
   
   // Fetch the list of user IDs present for this task
-  const { data: presentUserIds } = useCollection<{ id: string }>(presenceColRef);
+  const { data: presentUsers } = useCollection<AppUser>(presenceColRef);
 
-  // Memoize the query for all users in the 'users' collection
-  const usersColRef = useMemoFirebase(() => {
-    if (!firestore) return null;
-    return collection(firestore, "users");
-  }, [firestore]);
-  
-  // Fetch all user profiles
-  const { data: allUsers } = useCollection<AppUser>(usersColRef);
 
   // Filter all users to get the profiles of those who are currently present
   const viewingUsers = useMemo(() => {
-    if (!presentUserIds || !allUsers) return [];
-    const idSet = new Set(presentUserIds.map((u) => u.id));
-    return allUsers.filter((user) => idSet.has(user.id));
-  }, [presentUserIds, allUsers]);
+    if (!presentUsers) return [];
+    return presentUsers;
+  }, [presentUsers]);
 
   useEffect(() => {
     if (!firestore || !taskId || !currentUser) {
@@ -62,6 +56,8 @@ export function useTaskPresence(taskId: string, currentUser: User | null) {
       try {
         await setDoc(userPresenceRef, {
           id: currentUser.uid,
+          displayName: currentUser.displayName,
+          photoURL: currentUser.photoURL,
           timestamp: serverTimestamp(),
         });
         setIsPresent(true);

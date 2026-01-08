@@ -40,7 +40,7 @@ import { Separator } from '../ui/separator';
 import { useEffect, useState, useMemo } from 'react';
 import { useUser, useCollection, useFirestore, useMemoFirebase, updateDocumentNonBlocking, useDoc } from '@/firebase';
 import { useTaskPresence } from '@/hooks/use-task-presence';
-import { collection, doc, serverTimestamp, Timestamp, query, where } from 'firebase/firestore';
+import { collection, doc, serverTimestamp, Timestamp, query, where, documentId } from 'firebase/firestore';
 import {
   Tooltip,
   TooltipProvider,
@@ -90,7 +90,7 @@ function TaskDetails({ task }: { task: Task }) {
 
   const membersQuery = useMemoFirebase(() => {
     if (!firestore || !project?.memberIds || project.memberIds.length === 0) return null;
-    return query(collection(firestore, 'users'), where('id', 'in', project.memberIds));
+    return query(collection(firestore, 'users'), where(documentId(), 'in', project.memberIds));
   }, [firestore, project]);
   const { data: projectMembers } = useCollection<User>(membersQuery);
 
@@ -227,10 +227,10 @@ function TaskDetails({ task }: { task: Task }) {
                   <SelectItem key={user.id} value={user.id}>
                     <div className='flex items-center gap-2'>
                         <Avatar className='size-6'>
-                            <AvatarImage src={user.avatarUrl} alt={user.name} />
-                            <AvatarFallback>{user.name.charAt(0)}</AvatarFallback>
+                            <AvatarImage src={user.photoURL} alt={user.displayName} />
+                            <AvatarFallback>{user.displayName?.charAt(0)}</AvatarFallback>
                         </Avatar>
-                        <span>{user.name}</span>
+                        <span>{user.displayName}</span>
                     </div>
                   </SelectItem>
                 ))}
@@ -390,12 +390,12 @@ function TaskDetails({ task }: { task: Task }) {
                   <Tooltip key={user.id}>
                     <TooltipTrigger asChild>
                       <Avatar className="size-8 border-2 border-background">
-                        <AvatarImage src={user.avatarUrl} alt={user.name} />
-                        <AvatarFallback>{user.name.charAt(0)}</AvatarFallback>
+                        <AvatarImage src={user.photoURL} alt={user.displayName} />
+                        <AvatarFallback>{user.displayName?.charAt(0)}</AvatarFallback>
                       </Avatar>
                     </TooltipTrigger>
                     <TooltipContent>
-                      <p>{user.name} está visualizando</p>
+                      <p>{user.displayName} está visualizando</p>
                     </TooltipContent>
                   </Tooltip>
                 ))}
@@ -443,12 +443,12 @@ function TaskDetails({ task }: { task: Task }) {
               return (
                 <div key={comment.id} className="flex gap-3">
                   <Avatar className="size-9">
-                    <AvatarImage src={author?.avatarUrl} alt={author?.name} />
-                    <AvatarFallback>{author?.name?.charAt(0)}</AvatarFallback>
+                    <AvatarImage src={author?.photoURL} alt={author?.displayName} />
+                    <AvatarFallback>{author?.displayName?.charAt(0)}</AvatarFallback>
                   </Avatar>
                   <div className="space-y-1 w-full">
                     <div className="flex items-center gap-2">
-                      <p className="font-semibold text-sm">{author?.name}</p>
+                      <p className="font-semibold text-sm">{author?.displayName}</p>
                       <p className="text-xs text-muted-foreground">
                         {commentDate}
                       </p>

@@ -79,10 +79,10 @@ function TaskRow({ task }: { task: Task }) {
           {assignee && (
             <div className="flex items-center gap-2">
               <Avatar className="size-7">
-                <AvatarImage src={assignee.avatarUrl} alt={assignee.name} />
-                <AvatarFallback>{assignee.name.charAt(0)}</AvatarFallback>
+                <AvatarImage src={assignee.photoURL} alt={assignee.displayName} />
+                <AvatarFallback>{assignee.displayName?.charAt(0)}</AvatarFallback>
               </Avatar>
-              <span className="hidden md:inline">{assignee.name}</span>
+              <span className="hidden md:inline">{assignee.displayName}</span>
             </div>
           )}
         </TableCell>

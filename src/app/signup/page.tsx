@@ -102,9 +102,9 @@ export default function SignupPage() {
       
       setDocumentNonBlocking(userDocRef, {
         id: user.uid,
-        name: values.name,
+        displayName: values.name,
         email: values.email,
-        avatarUrl: user.photoURL || `https://i.pravatar.cc/150?u=${user.uid}`,
+        photoURL: user.photoURL || `https://i.pravatar.cc/150?u=${user.uid}`,
       }, { merge: true });
 
 

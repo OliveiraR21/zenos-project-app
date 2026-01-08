@@ -5,7 +5,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Plus, CalendarIcon } from 'lucide-react';
-import { collection, addDoc, serverTimestamp, Timestamp, doc, where, query } from 'firebase/firestore';
+import { collection, addDoc, serverTimestamp, Timestamp, doc, where, query, documentId } from 'firebase/firestore';
 import { useFirestore, useCollection, useMemoFirebase, useDoc } from '@/firebase';
 import { useToast } from '@/hooks/use-toast';
 import type { User, Project } from '@/lib/types';
@@ -69,7 +69,7 @@ export function NewTaskDialog({ projectId, children }: NewTaskDialogProps) {
 
   const projectMembersQuery = useMemoFirebase(() => {
     if (!firestore || !project?.memberIds || project.memberIds.length === 0) return null;
-    return query(collection(firestore, 'users'), where('id', 'in', project.memberIds));
+    return query(collection(firestore, 'users'), where(documentId(), 'in', project.memberIds));
   }, [firestore, project]);
 
   const { data: users } = useCollection<User>(projectMembersQuery);
@@ -241,10 +241,10 @@ export function NewTaskDialog({ projectId, children }: NewTaskDialogProps) {
                         <SelectItem key={user.id} value={user.id}>
                           <div className='flex items-center gap-2'>
                             <Avatar className='size-6'>
-                                <AvatarImage src={user.avatarUrl} alt={user.name} />
-                                <AvatarFallback>{user.name.charAt(0)}</AvatarFallback>
+                                <AvatarImage src={user.photoURL} alt={user.displayName} />
+                                <AvatarFallback>{user.displayName?.charAt(0)}</AvatarFallback>
                             </Avatar>
-                            <span>{user.name}</span>
+                            <span>{user.displayName}</span>
                           </div>
                         </SelectItem>
                       ))}
