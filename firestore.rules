@@ -16,8 +16,8 @@
  *   is inherited from the parent project. A `get()` call to the parent project document
  *   is used to verify membership before allowing access. This is secure but has a minor
  *   performance cost.
- * - User Privacy: User data is strictly segregated. Users cannot list other
- *   users' profiles or notifications, but any authenticated user can get a specific user's profile.
+ * - User Privacy: User data is strictly segregated. With the new changes, authenticated users
+ *   can list other users' profiles to facilitate collaboration, like assigning tasks.
  * - Immutable Ownership: Critical relational fields, such as `ownerId` on projects or
  *   `authorId` on comments, are immutable after creation to maintain data integrity.
  * - Presence Security: The `/presence` collection has restricted reads due to a data
@@ -65,13 +65,13 @@ service cloud.firestore {
      * @path /users/{userId}
      * @allow (create) A new user signing up: auth.uid matches {userId}.
      * @allow (get) Any authenticated user can read profile details of other users for collaboration.
-     * @deny (list) Any user attempting to list all users in the system.
+     * @allow (list) Any authenticated user can list all users in the system for collaboration features.
      * @deny (update) A user trying to modify another user's profile.
-     * @principle Restricts access to a user's own data tree for writes, allows reads for collaboration.
+     * @principle Restricts write access to a user's own data, allows reads for collaboration.
      */
     match /users/{userId} {
       allow get: if isSignedIn();
-      allow list: if false; // Prevent listing all users
+      allow list: if isSignedIn();
       allow create: if isOwner(userId) && request.resource.data.id == userId;
       allow update: if isOwner(userId) && isExistingDoc() && request.resource.data.id == resource.data.id;
       allow delete: if isOwner(userId) && isExistingDoc();
