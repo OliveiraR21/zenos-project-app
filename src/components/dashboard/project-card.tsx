@@ -29,7 +29,7 @@ function MemberAvatar({ user }: { user: User }) {
     <Tooltip>
       <TooltipTrigger asChild>
         <Avatar className="-ml-2 border-2 border-background bg-background">
-          <AvatarImage src={user.photoURL} alt={user.displayName} />
+          <AvatarImage src={user.avatarUrl} alt={user.displayName} />
           <AvatarFallback>{user.displayName?.charAt(0)}</AvatarFallback>
         </Avatar>
       </TooltipTrigger>
@@ -45,7 +45,6 @@ function ProjectMemberAvatars({ memberIds }: { memberIds: string[] }) {
 
   const membersQuery = useMemoFirebase(() => {
     if (!firestore || !memberIds || memberIds.length === 0) return null;
-    // Use documentId() to query by the document's actual ID
     return query(collection(firestore, 'users'), where(documentId(), 'in', memberIds));
   }, [firestore, memberIds]);
 
@@ -118,7 +117,7 @@ export function ProjectCard({ project }: ProjectCardProps) {
             <div className="text-sm text-muted-foreground flex items-center gap-2">
               <span className="font-medium">Dono:</span>
               <Avatar className="size-6">
-                <AvatarImage src={owner.photoURL} alt={owner.displayName} />
+                <AvatarImage src={owner.avatarUrl} alt={owner.displayName} />
                 <AvatarFallback>{owner.displayName?.charAt(0)}</AvatarFallback>
               </Avatar>
               <span>{owner.displayName}</span>

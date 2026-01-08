@@ -1,8 +1,8 @@
 export interface User {
   id: string;
-  displayName: string;
+  name: string;        // MUDAR DE: displayName
   email: string;
-  photoURL: string;
+  avatarUrl: string;   // MUDAR DE: photoURL
 }
 
 export interface Project {

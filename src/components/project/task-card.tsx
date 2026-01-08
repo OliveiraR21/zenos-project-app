@@ -118,12 +118,14 @@ export function TaskCard({ task }: TaskCardProps) {
                                 <Tooltip>
                                     <TooltipTrigger>
                                         <Avatar className="size-7">
-                                            <AvatarImage src={assignee.photoURL} alt={assignee.displayName} />
-                                            <AvatarFallback>{assignee.displayName?.charAt(0)}</AvatarFallback>
+                                            {/* CORREÇÃO AQUI */}
+                                            <AvatarImage src={assignee.avatarUrl} alt={assignee.name} />
+                                            <AvatarFallback>{assignee.name?.charAt(0)}</AvatarFallback>
                                         </Avatar>
                                     </TooltipTrigger>
                                     <TooltipContent>
-                                        <p>Atribuído a {assignee.displayName}</p>
+                                        {/* CORREÇÃO AQUI */}
+                                        <p>Atribuído a {assignee.name}</p>
                                     </TooltipContent>
                                 </Tooltip>
                             </TooltipProvider>

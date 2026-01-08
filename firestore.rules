@@ -1,40 +1,3 @@
-/**
- * Core Philosophy: This ruleset enforces a collaborative, project-based security model.
- * Access to shared resources like tasks, comments, and attachments is primarily determined
- * by a user's membership in a parent project. User-specific data, such as profiles
- * and notifications, is strictly private and only accessible by the owner.
- *
- * Data Structure: The data is organized hierarchically. Core collaborative work happens
- * under the `/projects/{projectId}` collection. Each user also has a private data tree
- * at `/users/{userId}` for their profile and notifications. Top-level collections like
- * `/tags` store global, shared data.
- *
- * Key Security Decisions:
- * - Project Membership: A user is considered a member of a project if their UID is present
- *   in the project's `ownerId` field or its `memberIds` array.
- * - Inherited Access: Security for nested subcollections (like tasks, comments, subtasks)
- *   is inherited from the parent project. A `get()` call to the parent project document
- *   is used to verify membership before allowing access. This is secure but has a minor
- *   performance cost.
- * - User Privacy: User data is strictly segregated. With the new changes, authenticated users
- *   can list other users' profiles to facilitate collaboration, like assigning tasks.
- * - Immutable Ownership: Critical relational fields, such as `ownerId` on projects or
- *   `authorId` on comments, are immutable after creation to maintain data integrity.
- * - Presence Security: The `/presence` collection has restricted reads due to a data
- *   structure that prevents securely linking a task back to its project. Writes are
- *   limited to the user themselves. For secure reads, the data path should be nested
- *   under a project (e.g., /projects/{projectId}/tasks/{taskId}/presence/{userId}).
- *
- * Denormalization for Authorization: To optimize performance and simplify rules, the
- * application should denormalize the project's `memberIds` array directly onto each `task`
- * document. While the current ruleset uses a `get()` call for security, denormalization
- * would eliminate this extra read, leading to faster and more cost-effective security
- * enforcement.
- *
- * Structural Segregation: User-private data (`/users`) is stored separately from collaborative
- * project data (`/projects`), creating a clear and secure boundary that simplifies list
- * queries and prevents accidental data leakage.
- */
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
@@ -71,6 +34,7 @@ service cloud.firestore {
      */
     match /users/{userId} {
       allow get: if isSignedIn();
+      // CORREÇÃO: Permite listar usuários para atribuir tarefas (dropdowns)
       allow list: if isSignedIn();
       allow create: if isOwner(userId) && request.resource.data.id == userId;
       allow update: if isOwner(userId) && isExistingDoc() && request.resource.data.id == resource.data.id;
@@ -196,8 +160,8 @@ service cloud.firestore {
       // to check for membership. To enable reads, change path to /projects/{projectId}/tasks/{taskId}/presence/{userId}.
       allow get, list: if false;
       allow create: if isOwner(userId);
-      update: if isOwner(userId) && isExistingDoc();
-      delete: if isOwner(userId) && isExistingDoc();
+      allow update: if isOwner(userId) && isExistingDoc();
+      allow delete: if isOwner(userId) && isExistingDoc();
     }
   }
 }
