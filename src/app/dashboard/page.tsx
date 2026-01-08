@@ -24,38 +24,22 @@ export default function DashboardPage() {
 
   const projectsQuery = useMemoFirebase(() => {
     if (!firestore || !user) return null;
+    // This single query is enough because memberIds always includes the owner.
     return query(
       collection(firestore, 'projects'),
       where('memberIds', 'array-contains', user.uid)
     );
   }, [firestore, user]);
 
-  const ownedProjectsQuery = useMemoFirebase(() => {
-    if (!firestore || !user) return null;
-    return query(
-      collection(firestore, 'projects'),
-      where('ownerId', '==', user.uid)
-    );
-  }, [firestore, user]);
+  const { data: projects, isLoading } = useCollection<Project>(projectsQuery);
 
-  const { data: memberProjects, isLoading: memberLoading } =
-    useCollection<Project>(projectsQuery);
-  const { data: ownedProjects, isLoading: ownerLoading } =
-    useCollection<Project>(ownedProjectsQuery);
-
-  if (isUserLoading || memberLoading || ownerLoading) {
+  if (isUserLoading || isLoading) {
     return <AppLayout>Carregando projetos...</AppLayout>;
   }
-  
+
   if (!user) {
     return null;
   }
-
-  const projects = [
-    ...(ownedProjects || []),
-    ...(memberProjects || []),
-  ].filter((p, i, a) => a.findIndex(t => t.id === p.id) === i);
-
 
   return (
     <AppLayout>
@@ -69,8 +53,19 @@ export default function DashboardPage() {
         </NewProjectDialog>
       </div>
 
-      {projects.length === 0 && (
-        <p>Você ainda não faz parte de nenhum projeto.</p>
+      {projects && projects.length === 0 && (
+        <div className="text-center py-10 border-2 border-dashed rounded-lg">
+            <h2 className="text-xl font-semibold">Nenhum projeto encontrado</h2>
+            <p className="text-muted-foreground mt-2">
+            Comece criando um novo projeto para organizar suas tarefas.
+            </p>
+            <NewProjectDialog>
+                <Button className="mt-4">
+                    <Plus className="mr-2 h-4 w-4" />
+                    Criar Projeto
+                </Button>
+            </NewProjectDialog>
+        </div>
       )}
 
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">

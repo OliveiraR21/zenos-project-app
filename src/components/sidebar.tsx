@@ -27,32 +27,16 @@ export function AppSidebar() {
   const firestore = useFirestore();
   const { user } = useUser();
 
-  const projectsQuery = useMemoFirebase(
-    () => {
-      if (!firestore || !user) return null;
-      return query(
-        collection(firestore, 'projects'),
-        where('memberIds', 'array-contains', user.uid)
-      );
-    },
-    [firestore, user]
-  );
-  
-  const ownedProjectsQuery = useMemoFirebase(() => {
+  const projectsQuery = useMemoFirebase(() => {
     if (!firestore || !user) return null;
+    // This single query is enough because memberIds always includes the owner.
     return query(
       collection(firestore, 'projects'),
-      where('ownerId', '==', user.uid)
+      where('memberIds', 'array-contains', user.uid)
     );
   }, [firestore, user]);
 
-  const { data: memberProjects } = useCollection<Project>(projectsQuery);
-  const { data: ownedProjects } = useCollection<Project>(ownedProjectsQuery);
-
-  const projects = [
-    ...(ownedProjects || []),
-    ...(memberProjects || []),
-  ].filter((p, i, a) => a.findIndex(t => t.id === p.id) === i);
+  const { data: projects } = useCollection<Project>(projectsQuery);
 
   return (
     <Sidebar collapsible="icon">

@@ -12,8 +12,8 @@ export interface Project {
   description: string;
   ownerId: string;
   memberIds: string[];
-  startDate: string;
-  endDate?: string;
+  startDate: any;
+  endDate?: any;
   status: 'Not Started' | 'In Progress' | 'Completed' | 'On Hold';
   estimatedGains?: number;
 }
