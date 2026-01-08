@@ -9,7 +9,7 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { useDoc, useFirestore, useMemoFirebase } from '@/firebase';
+import { useCollection, useDoc, useFirestore, useMemoFirebase } from '@/firebase';
 import type { Project, User } from '@/lib/types';
 import {
   Tooltip,
@@ -17,25 +17,14 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '@/components/ui/tooltip';
-import { doc } from 'firebase/firestore';
+import { collection, doc, query, where } from 'firebase/firestore';
 import { useMemo } from 'react';
 
 interface ProjectCardProps {
   project: Project;
 }
 
-function MemberAvatar({ userId }: { userId: string }) {
-  const firestore = useFirestore();
-  const userRef = useMemoFirebase(
-    () => (firestore && userId ? doc(firestore, 'users', userId) : null),
-    [firestore, userId]
-  );
-  const { data: user } = useDoc<User>(userRef);
-
-  if (!user) {
-    return null; // ou um esqueleto/placeholder
-  }
-
+function MemberAvatar({ user }: { user: User }) {
   return (
     <Tooltip>
       <TooltipTrigger asChild>
@@ -52,18 +41,40 @@ function MemberAvatar({ userId }: { userId: string }) {
 }
 
 function ProjectMemberAvatars({ memberIds }: { memberIds: string[] }) {
-  const visibleMembers = memberIds.slice(0, 5);
-  const remainingMembers = memberIds.length - visibleMembers.length;
+  const firestore = useFirestore();
+
+  const membersQuery = useMemoFirebase(() => {
+    if (!firestore || !memberIds || memberIds.length === 0) return null;
+    return query(collection(firestore, 'users'), where('id', 'in', memberIds));
+  }, [firestore, memberIds]);
+
+  const { data: members } = useCollection<User>(membersQuery);
+
+
+  if (!members) {
+     return (
+        <div className="flex items-center">
+            {Array.from({ length: Math.min(memberIds.length, 5) }).map((_, i) => (
+                 <Avatar key={i} className="-ml-2 border-2 border-background bg-background">
+                    <AvatarFallback>?</AvatarFallback>
+                 </Avatar>
+            ))}
+        </div>
+     );
+  }
+
+  const visibleMembers = members.slice(0, 5);
+  const remainingMembersCount = memberIds.length - visibleMembers.length;
 
   return (
     <TooltipProvider delayDuration={0}>
       <div className="flex items-center">
-        {visibleMembers.map((id) => (
-          <MemberAvatar key={id} userId={id} />
+        {visibleMembers.map((member) => (
+          <MemberAvatar key={member.id} user={member} />
         ))}
-        {remainingMembers > 0 && (
+        {remainingMembersCount > 0 && (
            <Avatar className="-ml-2 border-2 border-background bg-background">
-             <AvatarFallback>+{remainingMembers}</AvatarFallback>
+             <AvatarFallback>+{remainingMembersCount}</AvatarFallback>
            </Avatar>
         )}
       </div>
@@ -116,7 +127,7 @@ export function ProjectCard({ project }: ProjectCardProps) {
         <CardFooter>
           <div className="flex items-center justify-between w-full">
             <span className="text-sm text-muted-foreground">Membros</span>
-            <ProjectMemberAvatars memberIds={memberIds} />
+            {memberIds.length > 0 && <ProjectMemberAvatars memberIds={memberIds} />}
           </div>
         </CardFooter>
       </Card>

@@ -8,7 +8,7 @@ import {
   SheetTrigger,
 } from '@/components/ui/sheet';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import type { Task, TaskStatus, TaskPriority, User, Comment, Subtask } from '@/lib/types';
+import type { Task, TaskStatus, TaskPriority, User, Comment, Subtask, Project } from '@/lib/types';
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
 import { Textarea } from '../ui/textarea';
@@ -38,15 +38,16 @@ import {
 import { cn } from '@/lib/utils';
 import { Separator } from '../ui/separator';
 import { useEffect, useState, useMemo } from 'react';
-import { useUser, useCollection, useFirestore, useMemoFirebase, updateDocumentNonBlocking, setDocumentNonBlocking } from '@/firebase';
+import { useUser, useCollection, useFirestore, useMemoFirebase, updateDocumentNonBlocking, useDoc } from '@/firebase';
 import { useTaskPresence } from '@/hooks/use-task-presence';
-import { collection, doc, serverTimestamp, Timestamp } from 'firebase/firestore';
+import { collection, doc, serverTimestamp, Timestamp, query, where } from 'firebase/firestore';
 import {
   Tooltip,
   TooltipProvider,
   TooltipTrigger,
   TooltipContent,
 } from '../ui/tooltip';
+import Link from 'next/link';
 import { useToast } from '@/hooks/use-toast';
 
 interface TaskDetailsSheetProps {
@@ -69,22 +70,35 @@ const priorityOptions: { value: TaskPriority; label: string }[] = [
 
 function TaskDetails({ task }: { task: Task }) {
   const { user: currentUser } = useUser();
+  const firestore = useFirestore();
+  const { toast } = useToast();
+
   const { viewingUsers } = useTaskPresence(
     task.id,
     currentUser
   );
-  const firestore = useFirestore();
-  const { toast } = useToast();
-
-  const usersQuery = useMemoFirebase(() => {
-    if (!firestore) return null;
-    return collection(firestore, 'users');
-  }, [firestore]);
-  const { data: allUsers } = useCollection<User>(usersQuery);
 
   const [localTask, setLocalTask] = useState<Task>(task);
   const [newComment, setNewComment] = useState("");
   const [newSubtask, setNewSubtask] = useState("");
+
+  const projectRef = useMemoFirebase(() => {
+    if (!firestore || !task.projectId) return null;
+    return doc(firestore, 'projects', task.projectId);
+  }, [firestore, task.projectId]);
+  const { data: project } = useDoc<Project>(projectRef);
+
+  const membersQuery = useMemoFirebase(() => {
+    if (!firestore || !project?.memberIds || project.memberIds.length === 0) return null;
+    return query(collection(firestore, 'users'), where('id', 'in', project.memberIds));
+  }, [firestore, project]);
+  const { data: projectMembers } = useCollection<User>(membersQuery);
+
+  const allUsers = useMemo(() => {
+    if(!viewingUsers || !projectMembers) return [];
+    const all = [...viewingUsers, ...(projectMembers || [])];
+    return all.filter((u, i, a) => a.findIndex(t => t.id === u.id) === i);
+  }, [viewingUsers, projectMembers])
 
 
   useEffect(() => {
@@ -178,7 +192,7 @@ function TaskDetails({ task }: { task: Task }) {
             href={`/project/${localTask.projectId}/board`}
             className="font-medium text-primary hover:underline"
           >
-            {localTask.projectId}
+            {project?.name || localTask.projectId}
           </Link>
         </SheetDescription>
       </SheetHeader>
@@ -209,7 +223,7 @@ function TaskDetails({ task }: { task: Task }) {
                 <SelectValue placeholder="Selecione o responsável" />
               </SelectTrigger>
               <SelectContent>
-                {allUsers?.map((user) => (
+                {projectMembers?.map((user) => (
                   <SelectItem key={user.id} value={user.id}>
                     <div className='flex items-center gap-2'>
                         <Avatar className='size-6'>
