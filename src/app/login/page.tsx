@@ -91,7 +91,6 @@ export default function LoginPage() {
       });
       router.push('/dashboard');
     } catch (error: any) {
-      console.error('Falha no login:', error);
       let description = 'Ocorreu um erro ao tentar fazer login.';
       if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password' || error.code === 'auth/invalid-credential') {
         description = 'E-mail ou senha inválidos. Por favor, verifique e tente novamente.';
