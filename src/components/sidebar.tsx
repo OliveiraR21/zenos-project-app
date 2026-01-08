@@ -20,8 +20,6 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import Image from 'next/image';
-import { SheetTitle } from './ui/sheet';
-import { VisuallyHidden } from './ui/visually-hidden';
 
 export function AppSidebar() {
   const pathname = usePathname();
@@ -54,9 +52,6 @@ export function AppSidebar() {
             Zenos
           </span>
         </div>
-        <VisuallyHidden>
-            <SheetTitle>Navegação Principal</SheetTitle>
-        </VisuallyHidden>
       </SidebarHeader>
       <SidebarContent>
         <div
