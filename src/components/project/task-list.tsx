@@ -80,7 +80,7 @@ function TaskRow({ task }: { task: Task }) {
             <div className="flex items-center gap-2">
               <Avatar className="size-7">
                 <AvatarImage src={assignee.photoURL} alt={assignee.displayName} />
-                <AvatarFallback>{assignee.displayName.charAt(0)}</AvatarFallback>
+                <AvatarFallback>{assignee.displayName?.charAt(0)}</AvatarFallback>
               </Avatar>
               <span className="hidden md:inline">{assignee.displayName}</span>
             </div>

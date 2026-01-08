@@ -96,15 +96,20 @@ export default function SignupPage() {
 
       const user = userCredential.user;
 
-      await updateProfile(user, { displayName: values.name });
+      // CORREÇÃO: Aguarda a atualização do perfil antes de prosseguir
+      await updateProfile(user, { 
+        displayName: values.name,
+        photoURL: `https://i.pravatar.cc/150?u=${user.uid}` 
+      });
       
       const userDocRef = doc(firestore, 'users', user.uid);
       
+      // CORREÇÃO: Usa os dados atualizados de `user` após `updateProfile`
       setDocumentNonBlocking(userDocRef, {
         id: user.uid,
-        displayName: values.name,
-        email: values.email,
-        photoURL: user.photoURL || `https://i.pravatar.cc/150?u=${user.uid}`,
+        displayName: user.displayName,
+        email: user.email,
+        photoURL: user.photoURL,
       }, { merge: true });
 
 
